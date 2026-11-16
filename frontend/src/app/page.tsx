@@ -11,6 +11,7 @@ import { ImportModal } from '@/components/ImportModal';
 import { AdminPortal } from '@/components/AdminPortal';
 import { TimezoneOrbitAnimation } from '@/components/TimezoneOrbitAnimation';
 import { LandingPage } from '@/components/LandingPage';
+import { CommandPalette } from '@/components/CommandPalette';
 import { SmartEvent, EventCreateInput } from '@/types/event';
 import { LandingContent, DEFAULT_LANDING_CONTENT } from '@/types/cms';
 import { getLandingContent, saveLandingContent } from '@/lib/cmsStorage';
@@ -32,6 +33,7 @@ export default function DashboardPage() {
   // Modals
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [isImportOpen, setIsImportOpen] = useState(false);
+  const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
   const [snoozeTarget, setSnoozeTarget] = useState<SmartEvent | null>(null);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
@@ -60,7 +62,7 @@ export default function DashboardPage() {
 
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
         e.preventDefault();
-        searchInputRef.current?.focus();
+        setIsCommandPaletteOpen((prev) => !prev);
         return;
       }
 
@@ -141,6 +143,7 @@ export default function DashboardPage() {
         searchInputRef={searchInputRef}
         currentView={currentView}
         onViewChange={setCurrentView}
+        onOpenCommandPalette={() => setIsCommandPaletteOpen(true)}
       />
 
       <main>
@@ -299,6 +302,21 @@ export default function DashboardPage() {
         isOpen={isImportOpen}
         onClose={() => setIsImportOpen(false)}
         onImportComplete={handleImportComplete}
+        isDarkMode={isDarkMode}
+      />
+
+      {/* Global Raycast/Linear Command Palette (Cmd+K) */}
+      <CommandPalette
+        isOpen={isCommandPaletteOpen}
+        onClose={() => setIsCommandPaletteOpen(false)}
+        events={events}
+        onSelectEvent={(evt) => {
+          setCurrentView('dashboard');
+          setSearchQuery(evt.title);
+        }}
+        onOpenCreate={() => setIsDrawerOpen(true)}
+        onNavigate={setCurrentView}
+        onToggleTheme={() => setIsDarkMode(!isDarkMode)}
         isDarkMode={isDarkMode}
       />
     </div>

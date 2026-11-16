@@ -13,8 +13,25 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "CueSpace — Never miss a moment",
-  description: "Smart event and notification reminders for birthdays, anniversaries and deadlines.",
+  title: "CueSpace — Autonomous Timezone & Smart Event SaaS",
+  description: "Never miss a moment. Timezone-aware smart event tracking for birthdays, anniversaries and deadlines with 1-click snooze and multi-channel delivery.",
+  keywords: ["event reminders", "timezone scheduler", "smart calendar", "birthday tracker", "1-click snooze", "FastAPI Next.js SaaS"],
+  authors: [{ name: "CueSpace Core Team" }],
+  viewport: { width: "device-width", initialScale: 1, maximumScale: 1 },
+  themeColor: "#08080d",
+  openGraph: {
+    title: "CueSpace — Autonomous Timezone & Smart Event SaaS",
+    description: "Never miss a moment. High-reliability timezone-aware notifications across Email, WhatsApp & SMS.",
+    url: "https://cuespace.app",
+    siteName: "CueSpace",
+    locale: "en_US",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "CueSpace — Smart Event & Timezone SaaS",
+    description: "Timezone-aware reminders with 1-click snooze and multi-channel delivery.",
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

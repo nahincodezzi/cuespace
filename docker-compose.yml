@@ -1,0 +1,92 @@
+version: '3.8'
+
+services:
+  # ==========================================
+  # Redis: Task Queue & Redlock Mutex
+  # ==========================================
+  redis:
+    image: redis:7-alpine
+    container_name: cuespace-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+
+  # ==========================================
+  # Backend: FastAPI REST & Timezone Engine
+  # ==========================================
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: cuespace-backend
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=sqlite+aiosqlite:///./cuespace.db
+      - REDIS_URL=redis://redis:6379/0
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - SECRET_KEY=cuespace-enterprise-secret-key-change-in-prod
+      - ENVIRONMENT=production
+    depends_on:
+      - redis
+    volumes:
+      - backend_data:/app/data
+
+  # ==========================================
+  # Celery Worker: Multi-channel Dispatcher
+  # ==========================================
+  celery_worker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: cuespace-celery-worker
+    command: python -m celery -A app.workers.celery_app worker --loglevel=info
+    restart: unless-stopped
+    environment:
+      - DATABASE_URL=sqlite+aiosqlite:///./cuespace.db
+      - REDIS_URL=redis://redis:6379/0
+      - CELERY_BROKER_URL=redis://redis:6379/0
+    depends_on:
+      - redis
+      - backend
+
+  # ==========================================
+  # Celery Beat: 60s Cron Scheduler
+  # ==========================================
+  celery_beat:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: cuespace-celery-beat
+    command: python -m celery -A app.workers.celery_app beat --loglevel=info
+    restart: unless-stopped
+    environment:
+      - DATABASE_URL=sqlite+aiosqlite:///./cuespace.db
+      - REDIS_URL=redis://redis:6379/0
+      - CELERY_BROKER_URL=redis://redis:6379/0
+    depends_on:
+      - redis
+      - backend
+
+  # ==========================================
+  # Frontend: Next.js 16 Web Application
+  # ==========================================
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: cuespace-frontend
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - NEXT_PUBLIC_API_URL=http://backend:8000/api/v1
+    depends_on:
+      - backend
+
+volumes:
+  redis_data:
+  backend_data:

@@ -27,6 +27,7 @@ interface NavbarProps {
   searchInputRef: React.RefObject<HTMLInputElement | null>;
   currentView: 'landing' | 'dashboard' | 'admin' | 'orbit';
   onViewChange: (v: 'landing' | 'dashboard' | 'admin' | 'orbit') => void;
+  onOpenCommandPalette?: () => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
@@ -39,6 +40,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   searchInputRef,
   currentView,
   onViewChange,
+  onOpenCommandPalette,
 }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -155,23 +157,26 @@ export const Navbar: React.FC<NavbarProps> = ({
         {/* RIGHT: Search, Utilities & Action Buttons */}
         <div className="flex items-center gap-2 sm:gap-3">
           
-          {/* Quick Search Input */}
-          <div className="relative group hidden lg:block">
+          {/* Quick Search Input / Command Palette Trigger */}
+          <div 
+            onClick={onOpenCommandPalette}
+            className="relative group hidden lg:block cursor-pointer"
+          >
             <Search className={`w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 transition-colors ${
               isDarkMode 
-                ? 'text-zinc-500 group-focus-within:text-purple-400' 
-                : 'text-zinc-400 group-focus-within:text-indigo-600'
+                ? 'text-zinc-500 group-hover:text-purple-400' 
+                : 'text-zinc-400 group-hover:text-indigo-600'
             }`} />
             <input
               ref={searchInputRef}
               type="text"
-              placeholder="Search (Cmd+K)"
+              readOnly
+              placeholder="Search or type Cmd+K..."
               value={searchQuery}
-              onChange={(e) => onSearchChange(e.target.value)}
-              className={`w-44 focus:w-60 rounded-xl pl-8 pr-9 py-1.5 text-xs transition-all duration-200 focus:outline-none focus:ring-1 focus:ring-purple-500/40 ${
+              className={`w-48 hover:w-56 rounded-xl pl-8 pr-9 py-1.5 text-xs transition-all duration-200 cursor-pointer focus:outline-none ${
                 isDarkMode 
-                  ? 'bg-white/[0.03] hover:bg-white/[0.06] border border-white/[0.08] focus:bg-white/[0.07] text-zinc-100 placeholder-zinc-500' 
-                  : 'bg-zinc-100 border border-zinc-200 text-zinc-900 placeholder-zinc-400 focus:bg-white'
+                  ? 'bg-white/[0.03] hover:bg-white/[0.07] border border-white/[0.08] hover:border-purple-500/30 text-zinc-100 placeholder-zinc-500' 
+                  : 'bg-zinc-100 border border-zinc-200 text-zinc-900 placeholder-zinc-400 hover:bg-white'
               }`}
             />
             <div className="absolute right-2.5 top-1/2 -translate-y-1/2 flex items-center gap-0.5 text-[9px] font-mono px-1 py-0.5 rounded bg-white/5 text-zinc-400 border border-white/10 pointer-events-none">
