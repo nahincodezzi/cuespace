@@ -1,0 +1,73 @@
+@import "tailwindcss";
+
+:root {
+  --background: #08080d;
+  --foreground: #ededed;
+  --font-serif: 'Instrument Serif', Georgia, serif;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: 'Geist', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  overflow-x: hidden;
+}
+
+.font-serif-italic {
+  font-family: var(--font-serif);
+  font-style: italic;
+}
+
+/* CueSpace Cosmic Animations */
+@keyframes drift-a {
+  0%, 100% {
+    transform: translate(-4%, 0%) scale(1);
+  }
+  50% {
+    transform: translate(4%, 3%) scale(1.08);
+  }
+}
+
+@keyframes drift-b {
+  0%, 100% {
+    transform: translate(3%, 1%) scale(1.05);
+  }
+  50% {
+    transform: translate(-3%, -2%) scale(0.96);
+  }
+}
+
+@keyframes soft-pulse {
+  0%, 100% {
+    opacity: 0.55;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.85;
+    transform: scale(1.03);
+  }
+}
+
+.animate-drift-a {
+  animation: drift-a 14s ease-in-out infinite;
+}
+
+.animate-drift-b {
+  animation: drift-b 18s ease-in-out infinite;
+}
+
+.animate-soft-pulse {
+  animation: soft-pulse 6s ease-in-out infinite;
+}
+
+.glass-panel {
+  background: rgba(255, 255, 255, 0.025);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+}
