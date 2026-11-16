@@ -62,12 +62,6 @@ export const Navbar: React.FC<NavbarProps> = ({
       view: 'orbit' as const,
       badge: 'Live',
     },
-    {
-      id: 'admin',
-      label: 'Admin CMS',
-      icon: ShieldAlert,
-      view: 'admin' as const,
-    },
   ];
 
   return (
@@ -145,6 +139,17 @@ export const Navbar: React.FC<NavbarProps> = ({
               </button>
             );
           })}
+
+          {currentView === 'admin' && (
+            <button
+              onClick={() => onViewChange('dashboard')}
+              className="flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-semibold bg-purple-500/20 text-purple-300 border border-purple-500/30 hover:bg-purple-500/30 transition-all select-none ml-1"
+              title="Click to exit Admin Portal"
+            >
+              <ShieldAlert className="w-3.5 h-3.5" />
+              <span>Admin Mode (Exit)</span>
+            </button>
+          )}
         </nav>
 
         {/* RIGHT: Search, Utilities & Action Buttons */}

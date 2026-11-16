@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Sparkles, ArrowRight, ShieldCheck, Globe, BellRing, Clock, Calendar, Check, Compass, Lock } from 'lucide-react';
+import { Sparkles, ArrowRight, ShieldCheck, Globe, BellRing, Clock, Calendar, Check, Compass, Lock, ShieldAlert } from 'lucide-react';
 import { LandingContent } from '@/types/cms';
 import { SmartEvent } from '@/types/event';
 import { StatsCards } from '@/components/StatsCards';
@@ -135,8 +135,16 @@ export const LandingPage: React.FC<LandingPageProps> = ({
         </div>
 
         {/* Footer */}
-        <footer className="pt-12 pb-8 border-t border-white/[0.06] text-center text-xs text-zinc-500">
+        <footer className="pt-12 pb-8 border-t border-white/[0.06] flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-zinc-500">
           <p>{content.footerNotice}</p>
+          <button
+            onClick={onOpenAdmin}
+            className="flex items-center gap-1.5 text-zinc-600 hover:text-zinc-300 transition-colors text-xs font-mono group"
+            title="Enterprise CMS & Database Console"
+          >
+            <ShieldAlert className="w-3.5 h-3.5 text-zinc-600 group-hover:text-purple-400 transition-colors" />
+            <span>Admin Console</span>
+          </button>
         </footer>
 
       </section>
