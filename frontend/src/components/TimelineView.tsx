@@ -148,7 +148,7 @@ export const TimelineView: React.FC<TimelineViewProps> = ({
 
                   {event.description && (
                     <p className={`text-xs mt-1.5 line-clamp-1 ${
-                      isDarkMode ? 'text-zinc-400' : 'text-zinc-500'
+                      isDarkMode ? 'text-zinc-400' : 'text-zinc-600'
                     }`}>
                       {event.description}
                     </p>
@@ -156,7 +156,7 @@ export const TimelineView: React.FC<TimelineViewProps> = ({
 
                   {/* Metadata Row */}
                   <div className={`flex items-center gap-4 mt-3 text-xs flex-wrap ${
-                    isDarkMode ? 'text-zinc-500' : 'text-zinc-400'
+                    isDarkMode ? 'text-zinc-500' : 'text-zinc-600 font-medium'
                   }`}>
                     <span className="flex items-center gap-1">
                       <Calendar className="w-3.5 h-3.5 text-zinc-400" />

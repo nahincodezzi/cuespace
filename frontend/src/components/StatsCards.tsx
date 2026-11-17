@@ -32,10 +32,10 @@ export const StatsCards: React.FC<StatsCardsProps> = ({ events, isDarkMode }) =>
 
   const cardClass = isDarkMode
     ? 'bg-[#111318] border-white/[0.08] hover:border-white/[0.14]'
-    : 'bg-white border-zinc-200/90 shadow-xs hover:border-zinc-300';
+    : 'bg-white border-zinc-200 shadow-xs hover:border-zinc-300';
 
-  const textMutedClass = isDarkMode ? 'text-zinc-400' : 'text-zinc-500';
-  const textPrimaryClass = isDarkMode ? 'text-zinc-100' : 'text-zinc-900';
+  const textMutedClass = isDarkMode ? 'text-zinc-400' : 'text-zinc-600 font-medium';
+  const textPrimaryClass = isDarkMode ? 'text-zinc-100' : 'text-zinc-950';
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">

@@ -91,7 +91,7 @@ export const MasonryGridView: React.FC<MasonryGridViewProps> = ({
                 <span className={`text-[10px] font-semibold uppercase tracking-wider px-2.5 py-0.5 rounded-full border ${getCategoryBadge(event.category)}`}>
                   {event.category}
                 </span>
-                <span className={`text-xs font-mono tabular-nums font-medium ${isDarkMode ? 'text-zinc-400' : 'text-zinc-500'}`}>
+                <span className={`text-xs font-mono tabular-nums font-medium ${isDarkMode ? 'text-zinc-400' : 'text-zinc-600'}`}>
                   {event.original_date}
                 </span>
               </div>
@@ -100,13 +100,13 @@ export const MasonryGridView: React.FC<MasonryGridViewProps> = ({
                 {event.title}
               </h3>
               {event.description && (
-                <p className={`text-xs line-clamp-2 mb-4 ${isDarkMode ? 'text-zinc-400' : 'text-zinc-500'}`}>
+                <p className={`text-xs line-clamp-2 mb-4 ${isDarkMode ? 'text-zinc-400' : 'text-zinc-600'}`}>
                   {event.description}
                 </p>
               )}
 
               <div className={`space-y-2 text-xs pt-3 border-t ${
-                isDarkMode ? 'border-white/[0.06] text-zinc-400' : 'border-zinc-100 text-zinc-500'
+                isDarkMode ? 'border-white/[0.06] text-zinc-400' : 'border-zinc-200 text-zinc-600'
               }`}>
                 <div className="flex items-center justify-between">
                   <span>Reminder</span>

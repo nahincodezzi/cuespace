@@ -112,7 +112,11 @@ export const Navbar: React.FC<NavbarProps> = ({
         </div>
 
         {/* CENTER: Sleek Glass Navigation Tabs (Desktop) */}
-        <nav className="hidden md:flex items-center p-1 rounded-xl bg-white/[0.04] border border-white/[0.08] shadow-inner backdrop-blur-md">
+        <nav className={`hidden md:flex items-center p-1 rounded-xl shadow-inner backdrop-blur-md ${
+          isDarkMode 
+            ? 'bg-white/[0.04] border border-white/[0.08]' 
+            : 'bg-zinc-100/90 border border-zinc-200/90'
+        }`}>
           {navLinks.map((tab) => {
             const Icon = tab.icon;
             const isActive = currentView === tab.view;

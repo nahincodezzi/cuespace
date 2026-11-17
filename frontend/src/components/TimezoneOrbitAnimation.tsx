@@ -68,9 +68,9 @@ export const TimezoneOrbitAnimation: React.FC<TimezoneOrbitProps> = ({ events, i
 
   const containerBg = isDarkMode 
     ? 'bg-[#0E1017] border-white/[0.08]' 
-    : 'bg-white border-zinc-200/90 shadow-sm';
-  const textPrimary = isDarkMode ? 'text-zinc-100' : 'text-zinc-900';
-  const textMuted = isDarkMode ? 'text-zinc-400' : 'text-zinc-500';
+    : 'bg-white border-zinc-200 shadow-sm';
+  const textPrimary = isDarkMode ? 'text-zinc-100' : 'text-zinc-950';
+  const textMuted = isDarkMode ? 'text-zinc-400' : 'text-zinc-600 font-medium';
 
   return (
     <div className={`border rounded-3xl p-6 sm:p-8 mb-8 overflow-hidden relative transition-all duration-300 ${containerBg}`}>
@@ -158,7 +158,9 @@ export const TimezoneOrbitAnimation: React.FC<TimezoneOrbitProps> = ({ events, i
                   }`}
                 >
                   <div className="text-[11px] font-semibold tracking-tight">{c.city}</div>
-                  <div className={`text-[9px] font-mono ${isSelected ? 'text-indigo-100' : 'text-zinc-400'}`}>
+                  <div className={`text-[9px] font-mono ${
+                    isSelected ? 'text-indigo-100' : isDarkMode ? 'text-zinc-400' : 'text-zinc-600 font-medium'
+                  }`}>
                     {currentTime[c.tz] || '--:--'}
                   </div>
                 </button>

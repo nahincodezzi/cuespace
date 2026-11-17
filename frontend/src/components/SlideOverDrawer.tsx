@@ -87,8 +87,8 @@ export const SlideOverDrawer: React.FC<SlideOverDrawerProps> = ({
   };
 
   const bgDrawer = isDarkMode ? 'bg-[#0D0E13] border-white/[0.08]' : 'bg-white border-zinc-200';
-  const textPrimary = isDarkMode ? 'text-zinc-100' : 'text-zinc-900';
-  const textMuted = isDarkMode ? 'text-zinc-400' : 'text-zinc-500';
+  const textPrimary = isDarkMode ? 'text-zinc-100' : 'text-zinc-950 font-semibold';
+  const textMuted = isDarkMode ? 'text-zinc-400' : 'text-zinc-600 font-medium';
   const inputBg = isDarkMode 
     ? 'bg-white/[0.04] border-white/[0.08] text-zinc-100 placeholder-zinc-500 focus:border-indigo-500' 
     : 'bg-zinc-50 border-zinc-200 text-zinc-900 placeholder-zinc-400 focus:border-indigo-500';
