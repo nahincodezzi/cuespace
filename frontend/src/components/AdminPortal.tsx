@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { 
   Plus, Edit2, Trash2, Send, Clock, Shield, Database, 
-  Search, CheckCircle2, AlertTriangle, ArrowUpDown, RefreshCw, X, Lock, LogOut, LayoutTemplate, Sparkles, Check
+  Search, CheckCircle2, AlertTriangle, ArrowUpDown, RefreshCw, X, Lock, LogOut, LayoutTemplate, Sparkles, Check, MessageCircle
 } from 'lucide-react';
 import { SmartEvent, EventCreateInput } from '@/types/event';
 import { LandingContent, FeatureItem } from '@/types/cms';
@@ -533,10 +533,23 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                     </td>
                     <td className="px-4 py-3.5 text-right">
                       <div className="flex items-center justify-end gap-1">
+                        {ev.recipient_phone && (
+                          <a
+                            href={`https://wa.me/${ev.recipient_phone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(
+                              `Happy ${ev.category === 'birthday' ? 'Birthday' : 'Celebration'} ${ev.recipient_name || ''}! Wishing you the very best! 🎉 - from CueSpace`
+                            )}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="p-1.5 rounded-lg text-emerald-400 hover:bg-emerald-500/10 transition-colors"
+                            title={`Open direct WhatsApp chat with ${ev.recipient_phone}`}
+                          >
+                            <MessageCircle className="w-3.5 h-3.5" />
+                          </a>
+                        )}
                         <button
                           onClick={() => handleDispatchNow(ev.id, ev.title)}
-                          className="p-1.5 rounded-lg text-emerald-400 hover:bg-emerald-500/10"
-                          title="Trigger Immediate Dispatch Test"
+                          className="p-1.5 rounded-lg text-indigo-400 hover:bg-indigo-500/10 transition-colors"
+                          title="Trigger Immediate Server Dispatch Simulation"
                         >
                           <Send className="w-3.5 h-3.5" />
                         </button>
