@@ -1,18 +1,30 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { X, Calendar, Clock, Globe, Bell, Sparkles, AlertCircle, Info, Moon, Sun } from 'lucide-react';
+import { X, Calendar, Clock, Globe, Bell, Sparkles, AlertCircle, Info, Moon, Sun, Mail } from 'lucide-react';
 import { EventCreateInput, EventCategory, CalendarType, LeapYearHandling } from '@/types/event';
+import { getStoredTemplates, EmailTemplate } from '@/types/template';
 
 interface SlideOverDrawerProps {
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (data: EventCreateInput) => Promise<void>;
   isDarkMode: boolean;
+  onOpenTemplatesModal?: () => void;
 }
 
-export const SlideOverDrawer: React.FC<SlideOverDrawerProps> = ({ isOpen, onClose, onSubmit, isDarkMode }) => {
+export const SlideOverDrawer: React.FC<SlideOverDrawerProps> = ({ 
+  isOpen, 
+  onClose, 
+  onSubmit, 
+  isDarkMode,
+  onOpenTemplatesModal
+}) => {
   const [loading, setLoading] = useState(false);
+  const [templates, setTemplates] = useState<EmailTemplate[]>([]);
+  const [selectedTemplateId, setSelectedTemplateId] = useState<string>('formal-birthday');
+  const [customEmailBody, setCustomEmailBody] = useState<string>('');
+
   const [formData, setFormData] = useState<EventCreateInput>({
     title: '',
     description: '',
@@ -30,6 +42,18 @@ export const SlideOverDrawer: React.FC<SlideOverDrawerProps> = ({ isOpen, onClos
     recipient_phone: '',
     recipient_email: ''
   });
+
+  useEffect(() => {
+    if (isOpen) {
+      const tmpls = getStoredTemplates();
+      setTemplates(tmpls);
+      const match = tmpls.find(t => t.category === formData.category) || tmpls[0];
+      if (match) {
+        setSelectedTemplateId(match.id);
+        setCustomEmailBody(match.body);
+      }
+    }
+  }, [isOpen, formData.category]);
 
   // Handle ESC key to close
   useEffect(() => {
@@ -52,7 +76,10 @@ export const SlideOverDrawer: React.FC<SlideOverDrawerProps> = ({ isOpen, onClos
     if (!formData.title) return;
     setLoading(true);
     try {
-      await onSubmit(formData);
+      await onSubmit({
+        ...formData,
+        description: customEmailBody || formData.description
+      });
       onClose();
     } finally {
       setLoading(false);
@@ -327,30 +354,105 @@ export const SlideOverDrawer: React.FC<SlideOverDrawerProps> = ({ isOpen, onClos
                 </button>
               </div>
 
-              {/* Recipient Details */}
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className={`block text-xs font-medium mb-1.5 ${textMuted}`}>Recipient Name</label>
-                  <input
-                    type="text"
-                    placeholder="e.g. Sarah Rahman"
-                    value={formData.recipient_name || ''}
-                    onChange={(e) => setFormData({ ...formData, recipient_name: e.target.value })}
-                    className={`w-full rounded-xl px-3 py-2 text-xs focus:outline-none border ${inputBg}`}
-                  />
+              {/* Recipient Details: Name, WhatsApp & Email */}
+              <div className="space-y-3">
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className={`block text-xs font-medium mb-1.5 ${textMuted}`}>Recipient Name</label>
+                    <input
+                      type="text"
+                      placeholder="e.g. Tamanna Rahman"
+                      value={formData.recipient_name || ''}
+                      onChange={(e) => setFormData({ ...formData, recipient_name: e.target.value })}
+                      className={`w-full rounded-xl px-3 py-2 text-xs focus:outline-none border ${inputBg}`}
+                    />
+                  </div>
+                  <div>
+                    <label className={`block text-xs font-medium mb-1.5 ${textMuted}`}>Phone (WhatsApp)</label>
+                    <input
+                      type="text"
+                      placeholder="+8801633518042"
+                      value={formData.recipient_phone || ''}
+                      onChange={(e) => setFormData({ ...formData, recipient_phone: e.target.value })}
+                      className={`w-full rounded-xl px-3 py-2 text-xs focus:outline-none border ${inputBg}`}
+                    />
+                  </div>
                 </div>
+
                 <div>
-                  <label className={`block text-xs font-medium mb-1.5 ${textMuted}`}>Phone (WhatsApp)</label>
-                  <input
-                    type="text"
-                    placeholder="+8801711223344"
-                    value={formData.recipient_phone || ''}
-                    onChange={(e) => setFormData({ ...formData, recipient_phone: e.target.value })}
-                    className={`w-full rounded-xl px-3 py-2 text-xs focus:outline-none border ${inputBg}`}
-                  />
+                  <label className={`block text-xs font-medium mb-1.5 ${textMuted}`}>
+                    Recipient Email <span className="text-[10px] text-purple-400 font-normal">(for Formal Email Dispatch)</span>
+                  </label>
+                  <div className="relative">
+                    <Mail className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500" />
+                    <input
+                      type="email"
+                      placeholder="tamanna@example.com"
+                      value={formData.recipient_email || ''}
+                      onChange={(e) => setFormData({ ...formData, recipient_email: e.target.value })}
+                      className={`w-full rounded-xl pl-9 pr-3 py-2 text-xs focus:outline-none border ${inputBg}`}
+                    />
+                  </div>
                 </div>
               </div>
             </div>
+
+            {/* Section 4: Formal Email Template Customization */}
+            {formData.channels.email && (
+              <div className={`space-y-3 pt-4 border-t ${isDarkMode ? 'border-white/[0.06]' : 'border-zinc-200'} animate-in fade-in duration-200`}>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-purple-500"></span>
+                    <span className={`text-xs font-semibold uppercase tracking-wider ${textMuted}`}>4. Formal Email Template</span>
+                  </div>
+                  {onOpenTemplatesModal && (
+                    <button
+                      type="button"
+                      onClick={onOpenTemplatesModal}
+                      className="text-[11px] text-purple-400 hover:text-purple-300 font-medium underline flex items-center gap-1 cursor-pointer"
+                    >
+                      <Sparkles className="w-3 h-3" />
+                      <span>Manage / Create Templates</span>
+                    </button>
+                  )}
+                </div>
+
+                <div>
+                  <label className={`block text-[11px] mb-1.5 ${textMuted}`}>Choose Email Template</label>
+                  <select
+                    value={selectedTemplateId}
+                    onChange={(e) => {
+                      const selId = e.target.value;
+                      setSelectedTemplateId(selId);
+                      const found = templates.find(t => t.id === selId);
+                      if (found) setCustomEmailBody(found.body);
+                    }}
+                    className={`w-full rounded-xl px-3 py-2 text-xs focus:outline-none border ${selectBg}`}
+                  >
+                    {templates.map((t) => (
+                      <option key={t.id} value={t.id}>
+                        {t.name} ({t.category})
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className={`block text-[11px] mb-1.5 ${textMuted}`}>Formal Message Body (Customizable)</label>
+                  <textarea
+                    rows={4}
+                    value={customEmailBody}
+                    onChange={(e) => setCustomEmailBody(e.target.value)}
+                    placeholder="Enter formal email message..."
+                    className={`w-full rounded-xl p-3 text-xs font-mono leading-relaxed focus:outline-none border ${inputBg}`}
+                  />
+                  <div className="flex items-center justify-between text-[10px] text-zinc-500 mt-1">
+                    <span>Tags: {'{{recipient_name}}'}, {'{{event_title}}'}, {'{{event_date}}'}</span>
+                    <span className="text-purple-400">Formal HTML Layout Active</span>
+                  </div>
+                </div>
+              </div>
+            )}
           </form>
 
           {/* Footer */}

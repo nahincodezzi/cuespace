@@ -12,6 +12,7 @@ import { AdminPortal } from '@/components/AdminPortal';
 import { TimezoneOrbitAnimation } from '@/components/TimezoneOrbitAnimation';
 import { LandingPage } from '@/components/LandingPage';
 import { CommandPalette } from '@/components/CommandPalette';
+import { EmailTemplatesModal } from '@/components/EmailTemplatesModal';
 import { SmartEvent, EventCreateInput } from '@/types/event';
 import { LandingContent, DEFAULT_LANDING_CONTENT } from '@/types/cms';
 import { getLandingContent, saveLandingContent } from '@/lib/cmsStorage';
@@ -34,6 +35,7 @@ export default function DashboardPage() {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [isImportOpen, setIsImportOpen] = useState(false);
   const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
+  const [isTemplatesModalOpen, setIsTemplatesModalOpen] = useState(false);
   const [snoozeTarget, setSnoozeTarget] = useState<SmartEvent | null>(null);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
@@ -144,6 +146,7 @@ export default function DashboardPage() {
         currentView={currentView}
         onViewChange={setCurrentView}
         onOpenCommandPalette={() => setIsCommandPaletteOpen(true)}
+        onOpenTemplates={() => setIsTemplatesModalOpen(true)}
       />
 
       <main>
@@ -286,6 +289,15 @@ export default function DashboardPage() {
         onClose={() => setIsDrawerOpen(false)}
         onSubmit={handleCreateEvent}
         isDarkMode={isDarkMode}
+        onOpenTemplatesModal={() => setIsTemplatesModalOpen(true)}
+      />
+
+      {/* Formal Email Templates Manager Dialog */}
+      <EmailTemplatesModal
+        isOpen={isTemplatesModalOpen}
+        onClose={() => setIsTemplatesModalOpen(false)}
+        isDarkMode={isDarkMode}
+        showToast={showToast}
       />
 
       {/* 1-Click Snooze Dialog */}
@@ -318,6 +330,7 @@ export default function DashboardPage() {
         onNavigate={setCurrentView}
         onToggleTheme={() => setIsDarkMode(!isDarkMode)}
         isDarkMode={isDarkMode}
+        onOpenTemplates={() => setIsTemplatesModalOpen(true)}
       />
     </div>
   );

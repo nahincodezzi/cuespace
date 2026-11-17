@@ -13,7 +13,8 @@ import {
   LayoutDashboard, 
   Sparkles,
   Menu,
-  X
+  X,
+  Mail
 } from 'lucide-react';
 
 interface NavbarProps {
@@ -28,6 +29,7 @@ interface NavbarProps {
   currentView: 'landing' | 'dashboard' | 'admin' | 'orbit';
   onViewChange: (v: 'landing' | 'dashboard' | 'admin' | 'orbit') => void;
   onOpenCommandPalette?: () => void;
+  onOpenTemplates?: () => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
@@ -41,6 +43,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   currentView,
   onViewChange,
   onOpenCommandPalette,
+  onOpenTemplates,
 }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -201,6 +204,22 @@ export const Navbar: React.FC<NavbarProps> = ({
             <UploadCloud className="w-3.5 h-3.5 text-purple-400" />
             <span>Import</span>
           </button>
+
+          {/* Email Templates Manager Button */}
+          {onOpenTemplates && (
+            <button
+              onClick={onOpenTemplates}
+              className={`hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium border transition-all duration-200 cursor-pointer ${
+                isDarkMode
+                  ? 'text-zinc-300 hover:text-white bg-white/[0.03] hover:bg-white/[0.07] border-white/[0.08] hover:border-white/15'
+                  : 'text-zinc-700 hover:text-zinc-900 bg-zinc-100 hover:bg-zinc-200/80 border-zinc-200'
+              }`}
+              title="Manage Formal Email Templates"
+            >
+              <Mail className="w-3.5 h-3.5 text-purple-400" />
+              <span>Templates</span>
+            </button>
+          )}
 
           {/* Theme Toggle Button */}
           <button

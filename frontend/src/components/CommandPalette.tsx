@@ -13,7 +13,8 @@ import {
   ShieldAlert, 
   X,
   Command,
-  ArrowRight
+  ArrowRight,
+  Mail
 } from 'lucide-react';
 import { SmartEvent } from '@/types/event';
 import { generateIcsFile } from '@/lib/ics';
@@ -27,6 +28,7 @@ interface CommandPaletteProps {
   onNavigate: (view: 'landing' | 'dashboard' | 'orbit' | 'admin') => void;
   onToggleTheme: () => void;
   isDarkMode: boolean;
+  onOpenTemplates?: () => void;
 }
 
 export const CommandPalette: React.FC<CommandPaletteProps> = ({
@@ -38,6 +40,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
   onNavigate,
   onToggleTheme,
   isDarkMode,
+  onOpenTemplates,
 }) => {
   const [query, setQuery] = useState('');
   const [selectedIndex, setSelectedIndex] = useState(0);
@@ -111,6 +114,16 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
       action: () => {
         onClose();
         onToggleTheme();
+      }
+    },
+    {
+      id: 'email-templates',
+      label: 'Manage Formal Email Templates',
+      icon: Mail,
+      shortcut: 'E',
+      action: () => {
+        onClose();
+        if (onOpenTemplates) onOpenTemplates();
       }
     },
     {
