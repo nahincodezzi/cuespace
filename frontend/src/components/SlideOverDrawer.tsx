@@ -319,6 +319,49 @@ export const SlideOverDrawer: React.FC<SlideOverDrawerProps> = ({
                 )}
               </div>
 
+              {/* Advance Alert Timing (Lead Days Selector) */}
+              <div>
+                <label className={`block text-xs font-medium mb-1.5 flex items-center justify-between ${textMuted}`}>
+                  <span>Advance Alert Timing (কত দিন আগে মেসেজ আসবে)</span>
+                  <span className="text-[10px] text-indigo-400 font-normal">Multi-select</span>
+                </label>
+                <div className="grid grid-cols-4 gap-1.5">
+                  {[
+                    { label: 'On The Day', value: 0 },
+                    { label: '1 Day Before', value: 1 },
+                    { label: '2 Days Before', value: 2 },
+                    { label: '3 Days Before', value: 3 },
+                  ].map((opt) => {
+                    const active = formData.alert_lead_days.includes(opt.value);
+                    return (
+                      <button
+                        key={opt.value}
+                        type="button"
+                        onClick={() => {
+                          const current = formData.alert_lead_days;
+                          const updated = active
+                            ? current.filter((v) => v !== opt.value)
+                            : [...current, opt.value].sort((a, b) => b - a);
+                          setFormData({
+                            ...formData,
+                            alert_lead_days: updated.length > 0 ? updated : [0],
+                          });
+                        }}
+                        className={`py-1.5 px-2 rounded-lg text-[11px] font-medium border text-center transition-all ${
+                          active
+                            ? 'bg-indigo-600/20 text-indigo-300 border-indigo-500/50 shadow-xs'
+                            : isDarkMode
+                            ? 'bg-white/[0.02] text-zinc-400 border-white/[0.06] hover:bg-white/[0.05]'
+                            : 'bg-zinc-100 text-zinc-600 border-zinc-200 hover:bg-zinc-200'
+                        }`}
+                      >
+                        {opt.label}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
               {/* Progressive Disclosure: Leap Year ONLY appears when user picks Feb 29 */}
               {isFeb29 && (
                 <div className="p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/25 animate-in slide-in-from-top-2 duration-200">
