@@ -276,6 +276,49 @@ export async function configureSmtpApi(data: {
   return await res.json();
 }
 
+import { SpecialDaysResponse, SubscribeSpecialDaysPayload } from '@/types/specialDays';
+
+export async function fetchSpecialDays(year: number = 2026): Promise<SpecialDaysResponse> {
+  try {
+    const res = await fetch(`${API_BASE}/special-days/?year=${year}`, { cache: 'no-store' });
+    if (!res.ok) throw new Error('Failed to fetch special days');
+    return await res.json();
+  } catch (err) {
+    return {
+      year,
+      total_count: 0,
+      subscribed_count: 0,
+      special_days: []
+    };
+  }
+}
+
+export async function subscribeSpecialDaysApi(payload: SubscribeSpecialDaysPayload): Promise<any> {
+  const res = await fetch(`${API_BASE}/special-days/subscribe`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  });
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => ({}));
+    throw new Error(errorData.detail || 'Failed to subscribe to special days');
+  }
+  return await res.json();
+}
+
+export async function unsubscribeSpecialDaysApi(dayIds: string[]): Promise<any> {
+  const res = await fetch(`${API_BASE}/special-days/unsubscribe`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ day_ids: dayIds }),
+  });
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => ({}));
+    throw new Error(errorData.detail || 'Failed to unsubscribe');
+  }
+  return await res.json();
+}
+
 export async function sendTestEmailApi(data: {
   recipient_email: string;
   subject?: string;

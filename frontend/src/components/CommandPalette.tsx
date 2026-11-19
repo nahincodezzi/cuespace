@@ -25,7 +25,7 @@ interface CommandPaletteProps {
   events: SmartEvent[];
   onSelectEvent: (event: SmartEvent) => void;
   onOpenCreate: () => void;
-  onNavigate: (view: 'landing' | 'dashboard' | 'orbit' | 'admin') => void;
+  onNavigate: (view: 'landing' | 'dashboard' | 'orbit' | 'admin' | 'special_days') => void;
   onToggleTheme: () => void;
   isDarkMode: boolean;
   onOpenTemplates?: () => void;
@@ -104,6 +104,16 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
       action: () => {
         onClose();
         onNavigate('orbit');
+      }
+    },
+    {
+      id: 'go-special-days',
+      label: 'Open Special Days Calendar (BD & World)',
+      icon: Calendar,
+      shortcut: 'S',
+      action: () => {
+        onClose();
+        onNavigate('special_days');
       }
     },
     {

@@ -11,6 +11,7 @@ import { ImportModal } from '@/components/ImportModal';
 import { AdminPortal } from '@/components/AdminPortal';
 import { TimezoneOrbitAnimation } from '@/components/TimezoneOrbitAnimation';
 import { LandingPage } from '@/components/LandingPage';
+import { SpecialDaysHub } from '@/components/SpecialDaysHub';
 import { CommandPalette } from '@/components/CommandPalette';
 import { EmailTemplatesModal } from '@/components/EmailTemplatesModal';
 import { SmartEvent, EventCreateInput } from '@/types/event';
@@ -25,7 +26,7 @@ export default function DashboardPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [viewMode, setViewMode] = useState<'timeline' | 'grid'>('timeline');
-  const [currentView, setCurrentView] = useState<'landing' | 'dashboard' | 'admin' | 'orbit'>('landing');
+  const [currentView, setCurrentView] = useState<'landing' | 'dashboard' | 'admin' | 'orbit' | 'special_days'>('landing');
   const [isDarkMode, setIsDarkMode] = useState(true);
   
   // Landing Page CMS Content State
@@ -167,6 +168,15 @@ export default function DashboardPage() {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 animate-in fade-in duration-300">
             <TimezoneOrbitAnimation events={events} isDarkMode={isDarkMode} />
           </div>
+        )}
+
+        {/* VIEW 3: SPECIAL DAYS & OBSERVANCES CALENDAR (Bangladesh + Worldwide) */}
+        {currentView === 'special_days' && (
+          <SpecialDaysHub
+            isDarkMode={isDarkMode}
+            showToast={showToast}
+            onRefreshEvents={loadEvents}
+          />
         )}
 
         {/* VIEW 3: ADMIN CMS PORTAL */}

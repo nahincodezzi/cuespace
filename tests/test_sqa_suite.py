@@ -277,6 +277,42 @@ class TestLiveApiEndpoints(unittest.IsolatedAsyncioTestCase):
         res_verify = await self.client.get(f"/api/v1/events/{event_id}")
         self.assertEqual(res_verify.status_code, 404)
 
+    async def test_special_days_feature(self):
+        """Validates Bangladesh & Global special days listing, subscription, and unsubscription."""
+        # 1. Fetch special days
+        res_list = await self.client.get("/api/v1/special-days/?year=2026")
+        self.assertEqual(res_list.status_code, 200)
+        data = res_list.json()
+        self.assertGreaterEqual(data["total_count"], 20)
+        days = data["special_days"]
+        self.assertTrue(any(d["id"] == "bd-mother-language-day" for d in days))
+        self.assertTrue(any(d["id"] == "global-mothers-day" for d in days))
+        self.assertTrue(any(d["id"] == "global-mens-day" for d in days))
+
+        # 2. Subscribe to special days
+        sub_payload = {
+            "day_ids": ["bd-mother-language-day", "global-mens-day"],
+            "year": 2026,
+            "recipient_email": "test-subscriber@cuespace.app",
+            "alert_lead_days": [1, 2]
+        }
+        res_sub = await self.client.post("/api/v1/special-days/subscribe", json=sub_payload)
+        self.assertEqual(res_sub.status_code, 200)
+        sub_res = res_sub.json()
+        self.assertTrue(sub_res.get("success"))
+        self.assertEqual(sub_res.get("count"), 2)
+
+        # 3. Verify subscribed status in list
+        res_check = await self.client.get("/api/v1/special-days/?year=2026")
+        self.assertEqual(res_check.status_code, 200)
+        check_days = {d["id"]: d for d in res_check.json()["special_days"]}
+        self.assertTrue(check_days["bd-mother-language-day"]["is_subscribed"])
+        self.assertTrue(check_days["global-mens-day"]["is_subscribed"])
+
+        # 4. Unsubscribe
+        res_unsub = await self.client.post("/api/v1/special-days/unsubscribe", json={"day_ids": ["bd-mother-language-day", "global-mens-day"]})
+        self.assertEqual(res_unsub.status_code, 200)
+
 
 if __name__ == "__main__":
     unittest.main()

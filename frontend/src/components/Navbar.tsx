@@ -14,7 +14,8 @@ import {
   Sparkles,
   Menu,
   X,
-  Mail
+  Mail,
+  Calendar
 } from 'lucide-react';
 
 interface NavbarProps {
@@ -26,8 +27,8 @@ interface NavbarProps {
   onToggleTheme: () => void;
   totalEvents: number;
   searchInputRef: React.RefObject<HTMLInputElement | null>;
-  currentView: 'landing' | 'dashboard' | 'admin' | 'orbit';
-  onViewChange: (v: 'landing' | 'dashboard' | 'admin' | 'orbit') => void;
+  currentView: 'landing' | 'dashboard' | 'admin' | 'orbit' | 'special_days';
+  onViewChange: (v: 'landing' | 'dashboard' | 'admin' | 'orbit' | 'special_days') => void;
   onOpenCommandPalette?: () => void;
   onOpenTemplates?: () => void;
 }
@@ -59,6 +60,13 @@ export const Navbar: React.FC<NavbarProps> = ({
       label: 'Dashboard',
       icon: LayoutDashboard,
       view: 'dashboard' as const,
+    },
+    {
+      id: 'special_days',
+      label: 'Special Days',
+      icon: Calendar,
+      view: 'special_days' as const,
+      badge: 'BD & World',
     },
     {
       id: 'orbit',
