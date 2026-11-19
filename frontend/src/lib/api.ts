@@ -12,6 +12,7 @@ export interface AuditLog {
   sent_at?: string;
   error_message?: string;
   created_at?: string;
+  metadata_payload?: Record<string, any>;
 }
 
 export const INITIAL_DEMO_EVENTS: SmartEvent[] = [

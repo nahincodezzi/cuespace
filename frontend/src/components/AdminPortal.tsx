@@ -3,7 +3,8 @@
 import React, { useState, useEffect } from 'react';
 import { 
   Plus, Edit2, Trash2, Send, Clock, Shield, Database, 
-  Search, CheckCircle2, AlertTriangle, ArrowUpDown, RefreshCw, X, Lock, LogOut, LayoutTemplate, Sparkles, Check, MessageCircle
+  Search, CheckCircle2, AlertTriangle, ArrowUpDown, RefreshCw, X, Lock, LogOut, LayoutTemplate, Sparkles, Check, MessageCircle,
+  Eye, ExternalLink, Mail
 } from 'lucide-react';
 import { SmartEvent, EventCreateInput } from '@/types/event';
 import { LandingContent, FeatureItem } from '@/types/cms';
@@ -46,6 +47,7 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
   // Audit Logs state
   const [auditLogs, setAuditLogs] = useState<AuditLog[]>([]);
   const [loadingLogs, setLoadingLogs] = useState(false);
+  const [selectedLogForPreview, setSelectedLogForPreview] = useState<AuditLog | null>(null);
 
   // Landing Page CMS Form State
   const [cmsForm, setCmsForm] = useState<LandingContent>(landingContent);
@@ -607,6 +609,7 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                   <th className="px-4 py-3">Recipient</th>
                   <th className="px-4 py-3">Status</th>
                   <th className="px-4 py-3">Dispatched Time</th>
+                  <th className="px-4 py-3 text-right">Message Preview</th>
                 </tr>
               </thead>
               <tbody className={`divide-y ${isDarkMode ? 'divide-white/[0.06]' : 'divide-zinc-200'}`}>
@@ -626,11 +629,133 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                     <td className={`px-4 py-3 font-mono text-[11px] ${textMuted}`}>
                       {log.sent_at || log.created_at || 'Just now'}
                     </td>
+                    <td className="px-4 py-3 text-right">
+                      <button
+                        onClick={() => setSelectedLogForPreview(log)}
+                        className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold border transition-all ${
+                          isDarkMode
+                            ? 'text-zinc-200 hover:text-white bg-white/[0.05] hover:bg-white/[0.1] border-white/[0.1]'
+                            : 'text-zinc-800 hover:text-zinc-950 bg-zinc-100 hover:bg-zinc-200 border-zinc-200 shadow-2xs'
+                        }`}
+                        title="View actual rendered message payload"
+                      >
+                        <Eye className="w-3.5 h-3.5 text-indigo-500" />
+                        <span>View Content</span>
+                      </button>
+                    </td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
+
+          {/* Modal: Live Local Message Preview */}
+          {selectedLogForPreview && (
+            <div 
+              className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-150"
+              onClick={() => setSelectedLogForPreview(null)}
+            >
+              <div 
+                className={`relative w-full max-w-2xl max-h-[85vh] border rounded-3xl p-6 shadow-2xl flex flex-col overflow-hidden animate-in zoom-in-95 duration-150 ${
+                  isDarkMode ? 'bg-[#0f111a] border-white/[0.12]' : 'bg-white border-zinc-200'
+                }`}
+                onClick={(e) => e.stopPropagation()}
+              >
+                {/* Header */}
+                <div className="flex items-center justify-between pb-4 border-b border-zinc-500/20 mb-4 shrink-0">
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-8 h-8 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400">
+                      {selectedLogForPreview.channel === 'EMAIL' ? <Mail className="w-4 h-4" /> : <MessageCircle className="w-4 h-4 text-emerald-400" />}
+                    </div>
+                    <div>
+                      <h3 className={`text-sm font-bold flex items-center gap-2 ${textPrimary}`}>
+                        <span>Local Dispatched {selectedLogForPreview.channel} Content</span>
+                        <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 border border-emerald-500/20">
+                          {selectedLogForPreview.status}
+                        </span>
+                      </h3>
+                      <p className={`text-[11px] ${textMuted}`}>
+                        Delivered to: <strong className={isDarkMode ? 'text-zinc-200' : 'text-zinc-800'}>{selectedLogForPreview.recipient}</strong> &bull; {selectedLogForPreview.sent_at || selectedLogForPreview.created_at}
+                      </p>
+                    </div>
+                  </div>
+                  <button 
+                    onClick={() => setSelectedLogForPreview(null)}
+                    className="p-1.5 rounded-lg text-zinc-400 hover:text-zinc-100 hover:bg-white/5 transition-all"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+
+                {/* Content Body */}
+                <div className="flex-1 overflow-y-auto space-y-4 pr-1">
+                  {selectedLogForPreview.channel === 'EMAIL' ? (
+                    <div>
+                      <div className={`p-3 rounded-xl border mb-3 text-xs ${
+                        isDarkMode ? 'bg-white/[0.02] border-white/[0.08]' : 'bg-zinc-50 border-zinc-200'
+                      }`}>
+                        <div className="font-semibold text-indigo-400 mb-1">
+                          Subject: {selectedLogForPreview.metadata_payload?.subject || 'CueSpace Milestone Reminder'}
+                        </div>
+                        <div className={`text-[11px] ${textMuted}`}>
+                          From: CueSpace Autonomous Engine &lt;notifications@cuespace.app&gt;
+                        </div>
+                      </div>
+
+                      {/* Rendered HTML Email Container */}
+                      <div className="border border-zinc-700/40 rounded-2xl p-4 bg-[#090A0F] text-[#EDEDED] text-xs shadow-inner">
+                        {selectedLogForPreview.metadata_payload?.html_body ? (
+                          <div dangerouslySetInnerHTML={{ __html: selectedLogForPreview.metadata_payload.html_body }} />
+                        ) : (
+                          <div className="p-4 text-center text-zinc-400 italic">
+                            Email notification logged for {selectedLogForPreview.recipient}. (No raw HTML saved for this legacy record)
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  ) : (
+                    <div>
+                      {/* WhatsApp / SMS Chat Bubble */}
+                      <div className="p-4 rounded-2xl bg-zinc-950 border border-zinc-800 space-y-3">
+                        <div className="text-[11px] font-semibold text-emerald-400 flex items-center gap-1.5">
+                          <MessageCircle className="w-3.5 h-3.5" />
+                          <span>WhatsApp Message Preview</span>
+                        </div>
+                        <div className="max-w-md bg-emerald-950/60 border border-emerald-500/30 text-emerald-100 p-4 rounded-2xl rounded-tl-none text-xs leading-relaxed whitespace-pre-line shadow-md">
+                          {selectedLogForPreview.metadata_payload?.message_text || 
+                            `🎉 CueSpace Reminder: Notification dispatched to ${selectedLogForPreview.recipient}.`}
+                        </div>
+                        {selectedLogForPreview.recipient && (
+                          <a
+                            href={`https://wa.me/${selectedLogForPreview.recipient.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(
+                              selectedLogForPreview.metadata_payload?.message_text || 'CueSpace Reminder'
+                            )}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold text-white bg-emerald-600 hover:bg-emerald-500 transition-all shadow-sm"
+                          >
+                            <ExternalLink className="w-3.5 h-3.5" />
+                            <span>Open Direct in WhatsApp Web</span>
+                          </a>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Footer */}
+                <div className="pt-4 border-t border-zinc-500/20 flex items-center justify-between mt-3 shrink-0">
+                  <span className={`text-[11px] ${textMuted}`}>Local Sandbox Simulation &bull; 100% Offline Safe</span>
+                  <button
+                    onClick={() => setSelectedLogForPreview(null)}
+                    className="px-4 py-1.5 rounded-xl text-xs font-semibold bg-zinc-200 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 hover:opacity-90 transition-all"
+                  >
+                    Close Preview
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       )}
 

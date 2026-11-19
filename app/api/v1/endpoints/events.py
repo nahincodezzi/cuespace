@@ -7,8 +7,9 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
+from app.core.config import settings
 from app.core.database import get_db
-from app.core.security import verify_signed_action_token
+from app.core.security import verify_signed_action_token, generate_signed_action_token
 from app.models.event import Event
 from app.models.tag import Tag
 from app.models.user import User
@@ -166,6 +167,7 @@ async def get_audit_logs(
             "sent_at": l.sent_at.isoformat() if l.sent_at else None,
             "error_message": l.error_message,
             "created_at": l.created_at.isoformat() if l.created_at else None,
+            "metadata_payload": l.metadata_payload or {},
         }
         for l in logs
     ]
@@ -330,23 +332,95 @@ async def trigger_dispatch_now(
     if not event:
         raise HTTPException(status_code=404, detail="Event not found")
 
-    # Record simulated immediate delivery log
-    log_entry = NotificationLog(
-        event_id=event.id,
-        channel="MANUAL_TEST",
-        recipient=event.recipient_email or event.recipient_phone or "Admin Tester",
-        status="DELIVERED",
-        scheduled_for=datetime.now(timezone.utc),
-        sent_at=datetime.now(timezone.utc),
-        metadata_payload={"triggered_by": "admin_cms", "title": event.title}
-    )
-    db.add(log_entry)
-    event.last_triggered_at = datetime.now(timezone.utc)
+    channels = event.channels or {}
+    now = datetime.now(timezone.utc)
+    created_logs = []
+
+    # 1. Email Channel Dispatch
+    if channels.get("email", True) or event.recipient_email:
+        recip_email = event.recipient_email or "recipient@cuespace.app"
+        token_3h = generate_signed_action_token({"event_id": str(event.id), "snooze_hours": 3})
+        token_24h = generate_signed_action_token({"event_id": str(event.id), "snooze_hours": 24})
+        snooze_url_3h = f"{settings.BACKEND_URL}/api/v1/events/snooze?token={token_3h}"
+        snooze_url_24h = f"{settings.BACKEND_URL}/api/v1/events/snooze?token={token_24h}"
+        
+        greeting_name = event.recipient_name or "Valued Guest"
+        email_subject = f"CueSpace Reminder: {event.title}"
+        email_html = f"""<div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 580px; margin: 0 auto; background: #0c0d14; border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; padding: 28px; color: #ededed;">
+  <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 14px; margin-bottom: 20px;">
+    <span style="font-size: 13px; font-weight: 700; color: #818cf8; letter-spacing: 0.05em; text-transform: uppercase;">✨ CueSpace Autonomous Alert</span>
+    <span style="font-size: 11px; color: #71717a;">{now.strftime('%b %d, %Y - %I:%M %p')} UTC</span>
+  </div>
+  <p style="font-size: 14px; color: #a1a1aa; margin: 0 0 8px 0;">Dear {greeting_name},</p>
+  <h2 style="font-size: 20px; font-weight: 700; color: #ffffff; margin: 0 0 12px 0;">{event.title}</h2>
+  <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; padding: 14px; margin-bottom: 20px;">
+    <p style="font-size: 13px; line-height: 1.6; color: #d4d4d8; margin: 0;">{event.description or 'Special milestone celebration scheduled in CueSpace.'}</p>
+    <div style="margin-top: 10px; font-size: 11px; color: #a1a1aa;">
+      <span>📅 Date: <strong>{event.original_date}</strong></span> &bull; 
+      <span>⏰ Reminder Time: <strong>{event.reminder_time.strftime('%H:%M') if hasattr(event.reminder_time, 'strftime') else str(event.reminder_time)[:5]}</strong></span> &bull; 
+      <span>🌍 Timezone: <strong>{event.timezone}</strong></span>
+    </div>
+  </div>
+  <div style="margin-bottom: 24px;">
+    <p style="font-size: 12px; color: #a1a1aa; margin: 0 0 10px 0;">Need to delay this alert? Use 1-click snooze below:</p>
+    <div style="display: flex; gap: 8px;">
+      <a href="{snooze_url_3h}" target="_blank" style="display: inline-block; background: #4f46e5; color: #ffffff; text-decoration: none; font-size: 12px; font-weight: 600; padding: 8px 16px; border-radius: 8px;">Snooze 3 Hours</a>
+      <a href="{snooze_url_24h}" target="_blank" style="display: inline-block; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); color: #ededed; text-decoration: none; font-size: 12px; font-weight: 600; padding: 8px 16px; border-radius: 8px;">Snooze 1 Day</a>
+    </div>
+  </div>
+  <div style="border-top: 1px solid rgba(255,255,255,0.06); padding-top: 14px; font-size: 10px; color: #71717a;">
+    Delivered automatically with timezone awareness by CueSpace &bull; Recipient: {recip_email}
+  </div>
+</div>"""
+
+        log_email = NotificationLog(
+            event_id=event.id,
+            channel="EMAIL",
+            recipient=recip_email,
+            status="DELIVERED",
+            scheduled_for=now,
+            sent_at=now,
+            metadata_payload={
+                "subject": email_subject,
+                "html_body": email_html,
+                "recipient_name": greeting_name,
+                "snooze_url_3h": snooze_url_3h,
+                "snooze_url_24h": snooze_url_24h,
+                "mode": "local_mock_dispatch"
+            }
+        )
+        db.add(log_email)
+        created_logs.append("Email")
+
+    # 2. WhatsApp Channel Dispatch
+    if channels.get("whatsapp", True) or event.recipient_phone:
+        recip_phone = event.recipient_phone or "+8801700000000"
+        greeting_name = event.recipient_name or "Friend"
+        wa_text = f"🎉 *CueSpace Alert:* Wishing a very Happy {event.category.title()}, {greeting_name}! 🌟\n\nEvent: *{event.title}*\nScheduled Date: {event.original_date} ({event.timezone})\nNote: {event.description or 'No extra notes'}\n\n_Delivered via CueSpace Timezone Engine._"
+        
+        log_wa = NotificationLog(
+            event_id=event.id,
+            channel="WHATSAPP",
+            recipient=recip_phone,
+            status="DELIVERED",
+            scheduled_for=now,
+            sent_at=now,
+            metadata_payload={
+                "message_text": wa_text,
+                "recipient_name": greeting_name,
+                "phone": recip_phone,
+                "mode": "local_mock_dispatch"
+            }
+        )
+        db.add(log_wa)
+        created_logs.append("WhatsApp")
+
+    event.last_triggered_at = now
     await db.commit()
 
     return {
         "success": True,
-        "message": f"Immediate alert dispatched successfully for '{event.title}'!",
-        "log_id": str(log_entry.id)
+        "message": f"Dispatched {', '.join(created_logs)} test notification(s) for '{event.title}'! You can view the message preview in Audit Logs.",
+        "dispatched_channels": created_logs
     }
 
