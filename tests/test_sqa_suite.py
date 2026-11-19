@@ -313,6 +313,18 @@ class TestLiveApiEndpoints(unittest.IsolatedAsyncioTestCase):
         res_unsub = await self.client.post("/api/v1/special-days/unsubscribe", json={"day_ids": ["bd-mother-language-day", "global-mens-day"]})
         self.assertEqual(res_unsub.status_code, 200)
 
+    async def test_live_alerts_api(self):
+        """TC-016: Live alerts endpoint correctly serves in-browser alarm polling"""
+        res = await self.client.get("/api/v1/events/live-alerts")
+        self.assertEqual(res.status_code, 200)
+        data = res.json()
+        self.assertIsInstance(data, list)
+
+        # Clear alerts
+        res_clear = await self.client.post("/api/v1/events/live-alerts/clear")
+        self.assertEqual(res_clear.status_code, 200)
+        self.assertTrue(res_clear.json().get("success"))
+
 
 if __name__ == "__main__":
     unittest.main()

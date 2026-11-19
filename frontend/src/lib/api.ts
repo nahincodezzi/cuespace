@@ -319,6 +319,26 @@ export async function unsubscribeSpecialDaysApi(dayIds: string[]): Promise<any> 
   return await res.json();
 }
 
+import { LiveAlertItem } from '@/components/LiveAlarmModal';
+
+export async function fetchLiveAlerts(): Promise<LiveAlertItem[]> {
+  try {
+    const res = await fetch(`${API_BASE}/events/live-alerts`, { cache: 'no-store' });
+    if (!res.ok) return [];
+    return await res.json();
+  } catch (err) {
+    return [];
+  }
+}
+
+export async function clearLiveAlertsApi(): Promise<void> {
+  try {
+    await fetch(`${API_BASE}/events/live-alerts/clear`, { method: 'POST' });
+  } catch (err) {
+    // silent
+  }
+}
+
 export async function sendTestEmailApi(data: {
   recipient_email: string;
   subject?: string;

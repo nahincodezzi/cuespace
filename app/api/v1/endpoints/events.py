@@ -19,6 +19,7 @@ from app.schemas.notification import SmtpConfigRequest, TestEmailRequest
 from app.services.recurrence import RecurrenceEngine
 from app.services.snooze import SnoozeService
 from app.services.email import send_real_email
+from app.services.scheduler import get_live_alerts, clear_live_alerts
 
 router = APIRouter()
 
@@ -173,6 +174,17 @@ async def get_audit_logs(
         }
         for l in logs
     ]
+
+
+@router.get("/live-alerts", summary="Get recent triggered live alerts for on-screen notification pop-up")
+async def fetch_live_alerts():
+    return get_live_alerts()
+
+
+@router.post("/live-alerts/clear", summary="Clear or dismiss live alerts")
+async def clear_alerts():
+    clear_live_alerts()
+    return {"success": True}
 
 
 @router.get(
@@ -533,4 +545,5 @@ async def send_test_email(payload: TestEmailRequest):
         "message": msg,
         "recipient": payload.recipient_email
     }
+
 

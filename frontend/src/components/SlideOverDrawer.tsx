@@ -71,6 +71,24 @@ export const SlideOverDrawer: React.FC<SlideOverDrawerProps> = ({
   // Check if date is Feb 29 for conditional disclosure
   const isFeb29 = formData.original_date.endsWith('-02-29');
 
+  const setTestTimeOffset = (minutes: number) => {
+    const now = new Date();
+    const future = new Date(now.getTime() + minutes * 60000);
+    const yyyy = future.getFullYear();
+    const mm = String(future.getMonth() + 1).padStart(2, '0');
+    const dd = String(future.getDate()).padStart(2, '0');
+    const hh = String(future.getHours()).padStart(2, '0');
+    const min = String(future.getMinutes()).padStart(2, '0');
+    setFormData((prev) => ({
+      ...prev,
+      title: prev.title || `Instant Test Alert (+${minutes}m)`,
+      original_date: `${yyyy}-${mm}-${dd}`,
+      reminder_time: `${hh}:${min}:00`,
+      recurrence_type: 'NONE',
+      alert_lead_days: [0]
+    }));
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.title) return;
@@ -227,6 +245,26 @@ export const SlideOverDrawer: React.FC<SlideOverDrawerProps> = ({
                     className={`w-full rounded-xl px-3 py-2 text-xs focus:outline-none border ${inputBg}`}
                   />
                 </div>
+              </div>
+
+              {/* Quick Test Presets */}
+              <div className="flex items-center gap-1.5 flex-wrap -mt-2">
+                <span className={`text-[10px] ${textMuted}`}>Quick Test:</span>
+                <button
+                  type="button"
+                  onClick={() => setTestTimeOffset(2)}
+                  className="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 hover:bg-indigo-500/20 transition-all flex items-center gap-1"
+                >
+                  <Sparkles className="w-2.5 h-2.5" />
+                  <span>⚡ 2 Mins From Now</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setTestTimeOffset(5)}
+                  className="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-purple-500/10 text-purple-400 border border-purple-500/20 hover:bg-purple-500/20 transition-all"
+                >
+                  5 Mins
+                </button>
               </div>
 
               {/* Timezone */}

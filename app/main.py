@@ -1,3 +1,4 @@
+import asyncio
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.responses import HTMLResponse
@@ -6,6 +7,7 @@ from app.core.config import settings
 from app.core.database import engine
 from app.models.base import Base
 from app.api.v1.router import api_router
+from app.services.scheduler import start_scheduler_loop
 
 
 @asynccontextmanager
@@ -14,8 +16,14 @@ async def lifespan(app: FastAPI):
     if settings.DEBUG:
         async with engine.begin() as conn:
             await conn.run_sync(Base.metadata.create_all)
+            
+    # Autonomous Heartbeat Scheduler (runs every 10s directly in FastAPI, zero Redis/Celery dependency required)
+    scheduler_task = asyncio.create_task(start_scheduler_loop())
+    
     yield
+    
     # Shutdown
+    scheduler_task.cancel()
     await engine.dispose()
 
 

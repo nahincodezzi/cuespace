@@ -17,7 +17,8 @@ import { EmailTemplatesModal } from '@/components/EmailTemplatesModal';
 import { SmartEvent, EventCreateInput } from '@/types/event';
 import { LandingContent, DEFAULT_LANDING_CONTENT } from '@/types/cms';
 import { getLandingContent, saveLandingContent } from '@/lib/cmsStorage';
-import { fetchEvents, createEventApi } from '@/lib/api';
+import { fetchEvents, createEventApi, fetchLiveAlerts, clearLiveAlertsApi } from '@/lib/api';
+import { LiveAlarmModal, LiveAlertItem } from '@/components/LiveAlarmModal';
 import { LayoutGrid, ListFilter, Sparkles, Compass, ShieldAlert, Calendar } from 'lucide-react';
 
 export default function DashboardPage() {
@@ -40,6 +41,10 @@ export default function DashboardPage() {
   const [snoozeTarget, setSnoozeTarget] = useState<SmartEvent | null>(null);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
+  // Real-time Live Alarm Modal State & Polling Tracking
+  const [activeLiveAlert, setActiveLiveAlert] = useState<LiveAlertItem | null>(null);
+  const seenAlertIdsRef = useRef<Set<string>>(new Set());
+
   const searchInputRef = useRef<HTMLInputElement | null>(null);
 
   // Load events and CMS content
@@ -55,6 +60,34 @@ export default function DashboardPage() {
   useEffect(() => {
     loadEvents();
     setLandingContent(getLandingContent());
+  }, []);
+
+  // Autonomous Live Alerts Polling Heartbeat (every 4 seconds)
+  useEffect(() => {
+    let isSubscribed = true;
+    const pollAlerts = async () => {
+      try {
+        const liveAlerts = await fetchLiveAlerts();
+        if (!isSubscribed || !liveAlerts || liveAlerts.length === 0) return;
+
+        // Find alert not yet shown in this session
+        const freshAlert = liveAlerts.find((a) => !seenAlertIdsRef.current.has(a.id));
+        if (freshAlert) {
+          seenAlertIdsRef.current.add(freshAlert.id);
+          setActiveLiveAlert(freshAlert);
+        }
+      } catch (err) {
+        // Handled silently
+      }
+    };
+
+    // Immediate check + repeating timer
+    pollAlerts();
+    const interval = setInterval(pollAlerts, 4000);
+    return () => {
+      isSubscribed = false;
+      clearInterval(interval);
+    };
   }, []);
 
   // Global Keyboard Shortcuts
@@ -326,6 +359,19 @@ export default function DashboardPage() {
         onImportComplete={handleImportComplete}
         isDarkMode={isDarkMode}
       />
+
+      {/* Real-time In-Browser Audio-Visual Alarm Modal */}
+      {activeLiveAlert && (
+        <LiveAlarmModal
+          alert={activeLiveAlert}
+          onDismiss={() => setActiveLiveAlert(null)}
+          onSnooze={(alertId, hours) => {
+            handleSnoozeSuccess(alertId, hours);
+            setActiveLiveAlert(null);
+          }}
+          isDarkMode={isDarkMode}
+        />
+      )}
 
       {/* Global Raycast/Linear Command Palette (Cmd+K) */}
       <CommandPalette
