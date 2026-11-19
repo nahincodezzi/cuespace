@@ -228,3 +228,66 @@ export async function fetchAuditLogs(): Promise<AuditLog[]> {
     ];
   }
 }
+
+export interface SmtpStatus {
+  smtp_enabled: boolean;
+  smtp_host: string;
+  smtp_port: number;
+  smtp_user: string;
+  has_password: boolean;
+  is_configured: boolean;
+  provider: string;
+}
+
+export async function fetchSmtpStatus(): Promise<SmtpStatus> {
+  try {
+    const res = await fetch(`${API_BASE}/events/smtp/status`, { cache: 'no-store' });
+    if (!res.ok) throw new Error('Failed to fetch SMTP status');
+    return await res.json();
+  } catch (err) {
+    return {
+      smtp_enabled: false,
+      smtp_host: 'smtp.gmail.com',
+      smtp_port: 587,
+      smtp_user: '',
+      has_password: false,
+      is_configured: false,
+      provider: 'Gmail SMTP'
+    };
+  }
+}
+
+export async function configureSmtpApi(data: {
+  smtp_user: string;
+  smtp_password: string;
+  smtp_enabled: boolean;
+  smtp_host?: string;
+  smtp_port?: number;
+}): Promise<{ success: boolean; message: string; status: any }> {
+  const res = await fetch(`${API_BASE}/events/smtp/configure`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => ({}));
+    throw new Error(errorData.detail || 'Failed to update SMTP settings');
+  }
+  return await res.json();
+}
+
+export async function sendTestEmailApi(data: {
+  recipient_email: string;
+  subject?: string;
+}): Promise<{ success: boolean; message: string; recipient: string }> {
+  const res = await fetch(`${API_BASE}/events/test-email`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => ({}));
+    throw new Error(errorData.detail || 'Failed to send test email');
+  }
+  return await res.json();
+}

@@ -9,7 +9,10 @@ import {
 import { SmartEvent, EventCreateInput } from '@/types/event';
 import { LandingContent, FeatureItem } from '@/types/cms';
 import { saveLandingContent } from '@/lib/cmsStorage';
-import { updateEventApi, deleteEventApi, dispatchNowApi, fetchAuditLogs, AuditLog } from '@/lib/api';
+import { 
+  updateEventApi, deleteEventApi, dispatchNowApi, fetchAuditLogs, AuditLog,
+  fetchSmtpStatus, configureSmtpApi, sendTestEmailApi, SmtpStatus
+} from '@/lib/api';
 
 interface AdminPortalProps {
   events: SmartEvent[];
@@ -36,8 +39,8 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
   const [loginPassword, setLoginPassword] = useState('admin123');
   const [loginError, setLoginError] = useState('');
 
-  // Admin Navigation Tabs: 'landing_cms' | 'events' | 'logs'
-  const [activeTab, setActiveTab] = useState<'landing_cms' | 'events' | 'logs'>('landing_cms');
+  // Admin Navigation Tabs: 'landing_cms' | 'events' | 'logs' | 'smtp'
+  const [activeTab, setActiveTab] = useState<'landing_cms' | 'events' | 'logs' | 'smtp'>('landing_cms');
   
   // Events CRUD state
   const [search, setSearch] = useState('');
@@ -48,6 +51,20 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
   const [auditLogs, setAuditLogs] = useState<AuditLog[]>([]);
   const [loadingLogs, setLoadingLogs] = useState(false);
   const [selectedLogForPreview, setSelectedLogForPreview] = useState<AuditLog | null>(null);
+
+  // Real Email & SMTP Configuration State
+  const [smtpStatus, setSmtpStatus] = useState<SmtpStatus | null>(null);
+  const [smtpUser, setSmtpUser] = useState('');
+  const [smtpPassword, setSmtpPassword] = useState('');
+  const [smtpEnabled, setSmtpEnabled] = useState(false);
+  const [smtpHost, setSmtpHost] = useState('smtp.gmail.com');
+  const [smtpPort, setSmtpPort] = useState(587);
+  const [isSavingSmtp, setIsSavingSmtp] = useState(false);
+
+  // Test Real Email State
+  const [testEmailRecipient, setTestEmailRecipient] = useState('');
+  const [isSendingTestEmail, setIsSendingTestEmail] = useState(false);
+  const [testEmailResult, setTestEmailResult] = useState<{ success: boolean; message: string } | null>(null);
 
   // Landing Page CMS Form State
   const [cmsForm, setCmsForm] = useState<LandingContent>(landingContent);
@@ -67,7 +84,68 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
 
   useEffect(() => {
     if (activeTab === 'logs') loadLogs();
+    if (activeTab === 'smtp') loadSmtp();
   }, [activeTab]);
+
+  const loadSmtp = async () => {
+    try {
+      const data = await fetchSmtpStatus();
+      setSmtpStatus(data);
+      setSmtpUser(data.smtp_user || '');
+      setSmtpEnabled(data.smtp_enabled);
+      setSmtpHost(data.smtp_host || 'smtp.gmail.com');
+      setSmtpPort(data.smtp_port || 587);
+    } catch (err) {
+      console.error('Failed to load SMTP status', err);
+    }
+  };
+
+  const handleSaveSmtp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!smtpUser || !smtpPassword) {
+      showToast('Please enter both your Gmail address and Google App Password.');
+      return;
+    }
+    setIsSavingSmtp(true);
+    try {
+      const res = await configureSmtpApi({
+        smtp_user: smtpUser,
+        smtp_password: smtpPassword,
+        smtp_enabled: smtpEnabled,
+        smtp_host: smtpHost,
+        smtp_port: smtpPort
+      });
+      showToast(res.message);
+      await loadSmtp();
+    } catch (err: any) {
+      showToast(`Error: ${err.message}`);
+    } finally {
+      setIsSavingSmtp(false);
+    }
+  };
+
+  const handleSendTestEmail = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!testEmailRecipient) {
+      showToast('Please enter a recipient email address to send test email.');
+      return;
+    }
+    setIsSendingTestEmail(true);
+    setTestEmailResult(null);
+    try {
+      const res = await sendTestEmailApi({
+        recipient_email: testEmailRecipient,
+        subject: '✨ CueSpace Real Email Dispatch Verification'
+      });
+      setTestEmailResult({ success: res.success, message: res.message });
+      showToast(res.message);
+    } catch (err: any) {
+      setTestEmailResult({ success: false, message: err.message });
+      showToast(`Failed: ${err.message}`);
+    } finally {
+      setIsSendingTestEmail(false);
+    }
+  };
 
   const loadLogs = async () => {
     setLoadingLogs(true);
@@ -306,6 +384,18 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
             >
               <Clock className="w-3.5 h-3.5 text-amber-400" />
               <span>Audit Logs</span>
+            </button>
+
+            <button
+              onClick={() => setActiveTab('smtp')}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                activeTab === 'smtp'
+                  ? isDarkMode ? 'bg-white/[0.1] text-white shadow-xs' : 'bg-white text-zinc-900 shadow-xs'
+                  : textMuted
+              }`}
+            >
+              <Mail className="w-3.5 h-3.5 text-purple-400" />
+              <span>Real Email & SMTP</span>
             </button>
           </div>
 
@@ -756,6 +846,210 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
               </div>
             </div>
           )}
+        </div>
+      )}
+
+      {/* ========================================================== */}
+      {/* TAB 4: REAL EMAIL & SMTP CONFIGURATION                     */}
+      {/* ========================================================== */}
+      {activeTab === 'smtp' && (
+        <div className="mt-6 space-y-8 animate-in fade-in">
+          {/* Status & Live Mode Indicator */}
+          <div className={`p-6 rounded-2xl border flex flex-col md:flex-row md:items-center justify-between gap-4 ${
+            isDarkMode ? 'bg-[#111318] border-white/[0.08]' : 'bg-white border-zinc-200 shadow-xs'
+          }`}>
+            <div>
+              <div className="flex items-center gap-2 mb-1.5">
+                <span className={`w-2.5 h-2.5 rounded-full ${
+                  smtpStatus?.is_configured ? 'bg-emerald-500 animate-pulse' : 'bg-amber-400'
+                }`} />
+                <h3 className={`text-base font-bold ${textPrimary}`}>
+                  {smtpStatus?.is_configured ? 'Real Email Engine Active' : 'Sandbox / Local Simulation Mode'}
+                </h3>
+              </div>
+              <p className={`text-xs ${textMuted}`}>
+                {smtpStatus?.is_configured 
+                  ? `Emails are dispatched directly to real recipient inboxes via ${smtpStatus.provider} (${smtpStatus.smtp_user}).`
+                  : 'Real email dispatch is not active yet. Enter your Gmail & 16-character Google App Password below to send real emails to your inbox.'}
+              </p>
+            </div>
+
+            <div className="flex items-center gap-2 shrink-0">
+              <span className={`text-xs px-3 py-1 rounded-full font-mono font-medium border ${
+                smtpStatus?.is_configured
+                  ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
+                  : 'bg-amber-500/10 text-amber-400 border-amber-500/20'
+              }`}>
+                {smtpStatus?.is_configured ? '● Live Dispatch' : '○ Sandbox'}
+              </span>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            {/* Box 1: Send Real Test Email */}
+            <div className={`p-6 rounded-2xl border flex flex-col justify-between ${
+              isDarkMode ? 'bg-white/[0.02] border-white/[0.08]' : 'bg-zinc-50 border-zinc-200'
+            }`}>
+              <div>
+                <div className="flex items-center gap-2 mb-3">
+                  <div className="w-7 h-7 rounded-lg bg-indigo-500/10 flex items-center justify-center text-indigo-400">
+                    <Send className="w-3.5 h-3.5" />
+                  </div>
+                  <h4 className={`text-sm font-bold ${textPrimary}`}>Send Real Test Email</h4>
+                </div>
+                <p className={`text-xs ${textMuted} mb-4`}>
+                  Type your personal email address below to immediately dispatch a CueSpace verification email to your real inbox.
+                </p>
+
+                <form onSubmit={handleSendTestEmail} className="space-y-3.5">
+                  <div>
+                    <label className={`block text-xs font-semibold mb-1 ${textPrimary}`}>
+                      Your Email Address (Recipient) *
+                    </label>
+                    <input
+                      type="email"
+                      required
+                      placeholder="e.g. yourname@gmail.com"
+                      value={testEmailRecipient}
+                      onChange={(e) => setTestEmailRecipient(e.target.value)}
+                      className={`w-full px-3.5 py-2.5 rounded-xl text-xs border focus:outline-none focus:ring-1 focus:ring-indigo-500 ${
+                        isDarkMode ? 'bg-white/[0.04] border-white/[0.1] text-white placeholder-zinc-500' : 'bg-white border-zinc-200 text-zinc-900 placeholder-zinc-400'
+                      }`}
+                    />
+                  </div>
+
+                  <button
+                    type="submit"
+                    disabled={isSendingTestEmail}
+                    className="w-full py-2.5 rounded-xl text-xs font-semibold text-white bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 shadow-md shadow-purple-600/25 transition-all flex items-center justify-center gap-2"
+                  >
+                    {isSendingTestEmail ? (
+                      <>
+                        <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                        <span>Sending Real Email...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Send className="w-3.5 h-3.5" />
+                        <span>Send Real Test Email Now</span>
+                      </>
+                    )}
+                  </button>
+                </form>
+
+                {testEmailResult && (
+                  <div className={`mt-4 p-3.5 rounded-xl border text-xs leading-relaxed ${
+                    testEmailResult.success
+                      ? 'bg-emerald-500/10 border-emerald-500/25 text-emerald-300'
+                      : 'bg-rose-500/10 border-rose-500/25 text-rose-300'
+                  }`}>
+                    <p className="font-semibold mb-0.5">
+                      {testEmailResult.success ? '✅ Success!' : '⚠️ Dispatch Result:'}
+                    </p>
+                    <p>{testEmailResult.message}</p>
+                    {testEmailResult.success && (
+                      <p className="mt-1 text-[11px] opacity-80">
+                        Check your Inbox (or Spam/Promotions tab) for "CueSpace Live Test".
+                      </p>
+                    )}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Box 2: Gmail SMTP Credentials Setup */}
+            <div className={`p-6 rounded-2xl border ${
+              isDarkMode ? 'bg-white/[0.02] border-white/[0.08]' : 'bg-zinc-50 border-zinc-200'
+            }`}>
+              <div className="flex items-center gap-2 mb-3">
+                <div className="w-7 h-7 rounded-lg bg-purple-500/10 flex items-center justify-center text-purple-400">
+                  <Mail className="w-3.5 h-3.5" />
+                </div>
+                <h4 className={`text-sm font-bold ${textPrimary}`}>Gmail SMTP Credentials</h4>
+              </div>
+              <p className={`text-xs ${textMuted} mb-4`}>
+                Configure your Gmail sender and Google App Password (saved to local runtime and .env).
+              </p>
+
+              <form onSubmit={handleSaveSmtp} className="space-y-3.5">
+                <div>
+                  <label className={`block text-xs font-semibold mb-1 ${textPrimary}`}>
+                    Gmail Sender Address *
+                  </label>
+                  <input
+                    type="email"
+                    required
+                    placeholder="your_email@gmail.com"
+                    value={smtpUser}
+                    onChange={(e) => setSmtpUser(e.target.value)}
+                    className={`w-full px-3.5 py-2 rounded-xl text-xs border focus:outline-none focus:ring-1 focus:ring-indigo-500 ${
+                      isDarkMode ? 'bg-white/[0.04] border-white/[0.1] text-white placeholder-zinc-500' : 'bg-white border-zinc-200 text-zinc-900 placeholder-zinc-400'
+                    }`}
+                  />
+                </div>
+
+                <div>
+                  <label className={`block text-xs font-semibold mb-1 ${textPrimary}`}>
+                    Google 16-Character App Password *
+                  </label>
+                  <input
+                    type="password"
+                    required
+                    placeholder="e.g. abcd efgh ijkl mnop"
+                    value={smtpPassword}
+                    onChange={(e) => setSmtpPassword(e.target.value)}
+                    className={`w-full px-3.5 py-2 rounded-xl text-xs font-mono border focus:outline-none focus:ring-1 focus:ring-indigo-500 ${
+                      isDarkMode ? 'bg-white/[0.04] border-white/[0.1] text-white placeholder-zinc-500' : 'bg-white border-zinc-200 text-zinc-900 placeholder-zinc-400'
+                    }`}
+                  />
+                </div>
+
+                <div className="flex items-center gap-2 pt-1">
+                  <input
+                    type="checkbox"
+                    id="enableSmtpCheck"
+                    checked={smtpEnabled}
+                    onChange={(e) => setSmtpEnabled(e.target.checked)}
+                    className="rounded border-zinc-600 text-indigo-600 focus:ring-indigo-500"
+                  />
+                  <label htmlFor="enableSmtpCheck" className={`text-xs font-semibold cursor-pointer ${textPrimary}`}>
+                    Enable Real Email Dispatch (Send to real recipients)
+                  </label>
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={isSavingSmtp}
+                  className="w-full py-2.5 rounded-xl text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-500 shadow-md shadow-indigo-600/25 transition-all flex items-center justify-center gap-2"
+                >
+                  {isSavingSmtp ? (
+                    <>
+                      <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                      <span>Saving Credentials...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Check className="w-3.5 h-3.5" />
+                      <span>Save & Activate Real Email</span>
+                    </>
+                  )}
+                </button>
+              </form>
+
+              {/* Guide Note */}
+              <div className={`mt-4 p-3 rounded-xl border text-[11px] leading-relaxed ${
+                isDarkMode ? 'bg-black/30 border-white/[0.06] text-zinc-400' : 'bg-white border-zinc-200 text-zinc-600'
+              }`}>
+                <p className="font-semibold text-indigo-400 mb-1">💡 How to generate Google App Password:</p>
+                <ol className="list-decimal list-inside space-y-0.5">
+                  <li>Turn on 2-Step Verification in your Google Account.</li>
+                  <li>Go to <a href="https://myaccount.google.com/apppasswords" target="_blank" rel="noreferrer" className="text-indigo-400 underline">myaccount.google.com/apppasswords</a></li>
+                  <li>Type app name "CueSpace" and click Create.</li>
+                  <li>Copy the 16-character code generated and paste it above!</li>
+                </ol>
+              </div>
+            </div>
+          </div>
         </div>
       )}
 

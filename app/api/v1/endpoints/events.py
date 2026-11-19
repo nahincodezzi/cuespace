@@ -15,8 +15,10 @@ from app.models.tag import Tag
 from app.models.user import User
 from app.models.notification_log import NotificationLog
 from app.schemas.event import EventCreate, EventUpdate, EventResponse
+from app.schemas.notification import SmtpConfigRequest, TestEmailRequest
 from app.services.recurrence import RecurrenceEngine
 from app.services.snooze import SnoozeService
+from app.services.email import send_real_email
 
 router = APIRouter()
 
@@ -373,24 +375,34 @@ async def trigger_dispatch_now(
   </div>
 </div>"""
 
+        # Attempt real dispatch if SMTP or Resend is enabled
+        real_sent, dispatch_msg = send_real_email(
+            to_email=recip_email,
+            subject=email_subject,
+            html_content=email_html
+        )
+        email_status = "DELIVERED" if real_sent else "FAILED"
+
         log_email = NotificationLog(
             event_id=event.id,
             channel="EMAIL",
             recipient=recip_email,
-            status="DELIVERED",
+            status=email_status,
             scheduled_for=now,
-            sent_at=now,
+            sent_at=now if real_sent else None,
+            error_message=None if real_sent else dispatch_msg,
             metadata_payload={
                 "subject": email_subject,
                 "html_body": email_html,
                 "recipient_name": greeting_name,
                 "snooze_url_3h": snooze_url_3h,
                 "snooze_url_24h": snooze_url_24h,
-                "mode": "local_mock_dispatch"
+                "dispatch_message": dispatch_msg,
+                "mode": "real_smtp" if settings.SMTP_ENABLED else "local_mock_dispatch"
             }
         )
         db.add(log_email)
-        created_logs.append("Email")
+        created_logs.append(f"Email ({email_status})")
 
     # 2. WhatsApp Channel Dispatch
     if channels.get("whatsapp", True) or event.recipient_phone:
@@ -413,14 +425,112 @@ async def trigger_dispatch_now(
             }
         )
         db.add(log_wa)
-        created_logs.append("WhatsApp")
+        created_logs.append("WhatsApp (Simulated)")
 
     event.last_triggered_at = now
     await db.commit()
 
     return {
         "success": True,
-        "message": f"Dispatched {', '.join(created_logs)} test notification(s) for '{event.title}'! You can view the message preview in Audit Logs.",
+        "message": f"Dispatched {', '.join(created_logs)} for '{event.title}'! You can view the message preview in Audit Logs.",
         "dispatched_channels": created_logs
+    }
+
+
+@router.get("/smtp/status", summary="Check Real Email & SMTP Configuration Status")
+async def get_smtp_status():
+    return {
+        "smtp_enabled": settings.SMTP_ENABLED,
+        "smtp_host": settings.SMTP_HOST,
+        "smtp_port": settings.SMTP_PORT,
+        "smtp_user": settings.SMTP_USER,
+        "has_password": bool(settings.SMTP_PASSWORD),
+        "is_configured": bool(settings.SMTP_ENABLED and settings.SMTP_USER and settings.SMTP_PASSWORD),
+        "provider": "Gmail SMTP" if "gmail" in (settings.SMTP_HOST or "").lower() else "Custom SMTP"
+    }
+
+
+@router.post("/smtp/configure", summary="Configure SMTP settings (updates runtime and .env)")
+async def configure_smtp(payload: SmtpConfigRequest):
+    settings.SMTP_USER = payload.smtp_user.strip()
+    settings.SMTP_PASSWORD = payload.smtp_password.strip()
+    settings.SMTP_ENABLED = payload.smtp_enabled
+    if payload.smtp_host:
+        settings.SMTP_HOST = payload.smtp_host.strip()
+    if payload.smtp_port:
+        settings.SMTP_PORT = payload.smtp_port
+
+    # Update .env file
+    env_path = ".env"
+    try:
+        with open(env_path, "r", encoding="utf-8") as f:
+            lines = f.readlines()
+        
+        updated_lines = []
+        for line in lines:
+            if line.startswith("SMTP_ENABLED="):
+                updated_lines.append(f"SMTP_ENABLED={settings.SMTP_ENABLED}\n")
+            elif line.startswith("SMTP_USER="):
+                updated_lines.append(f'SMTP_USER="{settings.SMTP_USER}"\n')
+            elif line.startswith("SMTP_PASSWORD="):
+                updated_lines.append(f'SMTP_PASSWORD="{settings.SMTP_PASSWORD}"\n')
+            elif line.startswith("SMTP_HOST="):
+                updated_lines.append(f'SMTP_HOST="{settings.SMTP_HOST}"\n')
+            elif line.startswith("SMTP_PORT="):
+                updated_lines.append(f'SMTP_PORT={settings.SMTP_PORT}\n')
+            else:
+                updated_lines.append(line)
+        
+        with open(env_path, "w", encoding="utf-8") as f:
+            f.writelines(updated_lines)
+    except Exception as e:
+        pass
+
+    return {
+        "success": True,
+        "message": f"SMTP settings saved! Sender: {settings.SMTP_USER} (Enabled: {settings.SMTP_ENABLED})",
+        "status": {
+            "smtp_enabled": settings.SMTP_ENABLED,
+            "smtp_user": settings.SMTP_USER,
+            "has_password": bool(settings.SMTP_PASSWORD)
+        }
+    }
+
+
+@router.post("/test-email", summary="Send an immediate real test email to any recipient")
+async def send_test_email(payload: TestEmailRequest):
+    if not payload.recipient_email:
+        raise HTTPException(status_code=400, detail="Recipient email is required")
+
+    subject = payload.subject or "✨ CueSpace Real Email Dispatch Verification"
+    html_body = f"""<div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 580px; margin: 0 auto; background: #0c0d14; border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; padding: 28px; color: #ededed;">
+  <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 14px; margin-bottom: 20px;">
+    <span style="font-size: 13px; font-weight: 700; color: #818cf8; letter-spacing: 0.05em; text-transform: uppercase;">CueSpace Live Test</span>
+    <span style="font-size: 11px; color: #71717a;">Real SMTP Active</span>
+  </div>
+  <h2 style="font-size: 20px; font-weight: 700; color: #ffffff; margin: 0 0 12px 0;">🎉 Congratulations! Real Email is Working!</h2>
+  <div style="background: rgba(99,102,241,0.08); border: 1px solid rgba(99,102,241,0.2); border-radius: 10px; padding: 16px; margin-bottom: 20px;">
+    <p style="font-size: 13px; line-height: 1.6; color: #e0e7ff; margin: 0;">
+      This email proves that CueSpace is successfully connected to your real email service and can automatically send timezone-aware reminders directly to real inboxes!
+    </p>
+  </div>
+  <p style="font-size: 12px; color: #a1a1aa; margin: 0 0 16px 0;">
+    Scheduled events, birthdays, anniversaries, and deadlines will now be delivered to your recipient's email right on schedule.
+  </p>
+  <div style="border-top: 1px solid rgba(255,255,255,0.06); padding-top: 14px; font-size: 10px; color: #71717a;">
+    Sent from CueSpace Autonomous Engine &bull; Recipient: {payload.recipient_email}
+  </div>
+</div>"""
+
+    success, msg = send_real_email(
+        to_email=payload.recipient_email,
+        subject=subject,
+        html_content=html_body
+    )
+
+    return {
+        "success": success,
+        "message": msg,
+        "recipient": payload.recipient_email
     }
 

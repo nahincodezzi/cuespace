@@ -33,6 +33,14 @@ class Settings(BaseSettings):
     EMAILS_FROM_EMAIL: str = "notifications@cuespace.app"
     EMAILS_FROM_NAME: str = "CueSpace"
 
+    # SMTP Configuration (e.g. Gmail SMTP, SendGrid, Amazon SES)
+    SMTP_ENABLED: bool = False
+    SMTP_HOST: str = "smtp.gmail.com"
+    SMTP_PORT: int = 587
+    SMTP_USER: str = ""
+    SMTP_PASSWORD: str = ""
+    SMTP_USE_TLS: bool = True
+
     TWILIO_ACCOUNT_SID: str = ""
     TWILIO_AUTH_TOKEN: str = ""
     TWILIO_PHONE_NUMBER: str = ""

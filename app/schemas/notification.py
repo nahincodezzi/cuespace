@@ -22,3 +22,16 @@ class NotificationLogResponse(BaseModel):
     metadata_payload: Dict[str, Any]
 
     model_config = ConfigDict(from_attributes=True)
+
+
+class SmtpConfigRequest(BaseModel):
+    smtp_user: str
+    smtp_password: str
+    smtp_enabled: bool = True
+    smtp_host: Optional[str] = "smtp.gmail.com"
+    smtp_port: Optional[int] = 587
+
+
+class TestEmailRequest(BaseModel):
+    recipient_email: str
+    subject: Optional[str] = None
