@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CueSpace — সম্পূর্ণ ইউজার গাইডলাইন ও ব্যবহারিক নির্দেশিকা</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    @page {
+      size: A4;
+      margin: 16mm 18mm 16mm 18mm;
+    }
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: 'Hind Siliguri', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      line-height: 1.65;
+      color: #1f2937;
+      background: #ffffff;
+      font-size: 13.5px;
+      -webkit-font-smoothing: antialiased;
+    }
+    .page-break {
+      page-break-after: always;
+      break-after: page;
+    }
+    .avoid-break {
+      page-break-inside: avoid;
+      break-inside: avoid;
+    }
+
+    /* Cover Page */
+    .cover {
+      height: 98vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 40px 20px;
+      text-align: center;
+      border: 2px solid #e5e7eb;
+      border-radius: 20px;
+      background: linear-gradient(145deg, #f8fafc 0%, #ffffff 50%, #f1f5f9 100%);
+    }
+    .cover-top {
+      margin-top: 40px;
+    }
+    .cover-badge {
+      display: inline-block;
+      padding: 6px 16px;
+      border-radius: 9999px;
+      background: #eef2ff;
+      color: #4f46e5;
+      font-weight: 600;
+      font-size: 13px;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      border: 1px solid #c7d2fe;
+      margin-bottom: 24px;
+    }
+    .cover-title {
+      font-size: 40px;
+      font-weight: 700;
+      color: #0f172a;
+      line-height: 1.25;
+      margin-bottom: 16px;
+    }
+    .cover-subtitle {
+      font-size: 18px;
+      color: #475569;
+      max-width: 580px;
+      margin: 0 auto;
+      line-height: 1.5;
+    }
+    .cover-card-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      max-width: 620px;
+      margin: 40px auto 0 auto;
+      text-align: left;
+    }
+    .cover-card {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 16px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    }
+    .cover-card-icon {
+      font-size: 24px;
+      margin-bottom: 8px;
+    }
+    .cover-card-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: #1e293b;
+      margin-bottom: 4px;
+    }
+    .cover-card-desc {
+      font-size: 11.5px;
+      color: #64748b;
+      line-height: 1.4;
+    }
+    .cover-footer {
+      border-top: 1px solid #e2e8f0;
+      padding-top: 20px;
+      font-size: 12px;
+      color: #64748b;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    /* Content Styling */
+    .header-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 2px solid #e2e8f0;
+      padding-bottom: 10px;
+      margin-bottom: 24px;
+    }
+    .header-logo {
+      font-size: 16px;
+      font-weight: 700;
+      color: #4f46e5;
+    }
+    .header-page-tag {
+      font-size: 11px;
+      color: #94a3b8;
+      text-transform: uppercase;
+      font-weight: 600;
+    }
+
+    h1, h2, h3, h4 {
+      color: #0f172a;
+      font-weight: 700;
+    }
+    h2 {
+      font-size: 22px;
+      border-left: 4px solid #4f46e5;
+      padding-left: 12px;
+      margin: 28px 0 16px 0;
+      line-height: 1.3;
+    }
+    h3 {
+      font-size: 16px;
+      margin: 18px 0 10px 0;
+      color: #1e293b;
+    }
+    p {
+      margin-bottom: 12px;
+      color: #334155;
+    }
+
+    /* Step Blocks */
+    .step-box {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 16px;
+    }
+    .step-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+    .step-number {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: #4f46e5;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+    .step-title {
+      font-size: 14.5px;
+      font-weight: 700;
+      color: #0f172a;
+    }
+
+    /* Info Callouts */
+    .callout {
+      padding: 14px 16px;
+      border-radius: 10px;
+      margin: 14px 0;
+      font-size: 12.5px;
+      line-height: 1.5;
+    }
+    .callout-tip {
+      background: #f0fdf4;
+      border-left: 4px solid #22c55e;
+      color: #166534;
+    }
+    .callout-warning {
+      background: #fffbeb;
+      border-left: 4px solid #f59e0b;
+      color: #92400e;
+    }
+    .callout-info {
+      background: #eff6ff;
+      border-left: 4px solid #3b82f6;
+      color: #1e40af;
+    }
+    .callout-title {
+      font-weight: 700;
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* Tables */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 16px 0;
+      font-size: 12.5px;
+    }
+    th, td {
+      border: 1px solid #e2e8f0;
+      padding: 10px 12px;
+      text-align: left;
+    }
+    th {
+      background: #f1f5f9;
+      font-weight: 700;
+      color: #1e293b;
+    }
+    tr:nth-child(even) {
+      background: #f8fafc;
+    }
+
+    /* Visual pill tags */
+    .pill {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 600;
+      margin: 1px 2px;
+    }
+    .pill-blue { background: #dbeafe; color: #1e40af; }
+    .pill-green { background: #dcfce7; color: #166534; }
+    .pill-purple { background: #f3e8ff; color: #6b21a8; }
+    .pill-amber { background: #fef3c7; color: #92400e; }
+
+    /* Code & keys */
+    kbd {
+      display: inline-block;
+      padding: 2px 6px;
+      font-size: 11px;
+      font-family: monospace;
+      background: #e2e8f0;
+      border: 1px solid #cbd5e1;
+      border-radius: 4px;
+      box-shadow: 0 1px 1px rgba(0,0,0,0.1);
+      color: #334155;
+    }
+    code {
+      font-family: monospace;
+      font-size: 11.5px;
+      background: #f1f5f9;
+      padding: 1px 4px;
+      border-radius: 4px;
+      color: #4f46e5;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ========================================================================= -->
+  <!-- COVER PAGE                                                                -->
+  <!-- ========================================================================= -->
+  <div class="cover">
+    <div class="cover-top">
+      <span class="cover-badge">অফিসিয়াল ইউজার গাইড ও ম্যানুয়াল</span>
+      <h1 class="cover-title">CueSpace ব্যবহার নির্দেশিকা</h1>
+      <p class="cover-subtitle">
+        স্বয়ংক্রিয় টাইমজোন-সচেতন স্মার্ট ইভেন্ট, জাতীয় ও আন্তর্জাতিক বিশেষ দিবস এবং মাল্টি-চ্যানেল নোটিফিকেশন ইঞ্জিন
+      </p>
+
+      <div class="cover-card-grid">
+        <div class="cover-card">
+          <div class="cover-card-icon">⚡</div>
+          <div class="cover-card-title">১-ক্লিক লাইভ টেস্ট</div>
+          <div class="cover-card-desc">ঘড়ির সাথে সাথে ২ মিনিটে অন-স্ক্রিন সুর ও অ্যালার্ম চেক করুন</div>
+        </div>
+        <div class="cover-card">
+          <div class="cover-card-icon">🇧🇩</div>
+          <div class="cover-card-title">স্পেশাল ডে অ্যালার্ট</div>
+          <div class="cover-card-desc">২১শে ফেব্রুয়ারি, পহেলা বৈশাখ, মা ও বাবা দিবসের ১-২ দিন আগে নোটিফিকেশন</div>
+        </div>
+        <div class="cover-card">
+          <div class="cover-card-icon">✉️</div>
+          <div class="cover-card-title">রিয়েল ইমেইল ও WhatsApp</div>
+          <div class="cover-card-desc">জিমেইল ইনবক্সে অফিসিয়াল ফরমাল বার্তা ও ১-ক্লিক হোয়াটসঅ্যাপ উইশ</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="cover-footer">
+      <div><strong>প্ল্যাটফর্ম:</strong> CueSpace Enterprise SaaS v1.0</div>
+      <div><strong>ওয়েবসাইট:</strong> http://localhost:3000</div>
+      <div><strong>তারিখ:</strong> নভেম্বর ২০২৬</div>
+    </div>
+  </div>
+
+  <div class="page-break"></div>
+
+  <!-- ========================================================================= -->
+  <!-- SECTION 1: INTRODUCTION & OVERVIEW                                        -->
+  <!-- ========================================================================= -->
+  <div class="header-bar">
+    <div class="header-logo">CueSpace Manual</div>
+    <div class="header-page-tag">অধ্যায় ১ — প্ল্যাটফর্ম পরিচিতি</div>
+  </div>
+
+  <h2>১. কিউস্পেস (CueSpace) কী এবং এটি কেন ব্যবহার করবেন?</h2>
+  <p>
+    <strong>CueSpace</strong> হলো একটি আধুনিক, টাইমজোন-সচেতন স্মার্ট ইভেন্ট ও অ্যালার্ট শিডিউলার। এটি আপনার পরিচিতজনদের জন্মদিন, বিবাহবার্ষিকী, কাজের ডেডলাইন কিংবা বাংলাদেশ ও আন্তর্জাতিক বিশেষ দিবসগুলো নিখুঁতভাবে মনে রাখে এবং নির্দিষ্ট সময়ে স্বয়ংক্রিয়ভাবে <strong>ইমেইল, হোয়াটসঅ্যাপ ও ব্রাউজার স্ক্রিনে</strong> অ্যালার্ট পাঠিয়ে দেয়।
+  </p>
+
+  <div class="callout callout-info avoid-break">
+    <div class="callout-title">💡 কেন CueSpace অন্যদের চেয়ে আলাদা?</div>
+    <p>সাধারণ ক্যালেন্ডারে সময় ভুলে যাওয়ার ভয় থাকে এবং কোনো আগাম নোটিফিকেশন থাকে না। CueSpace-এ আপনি যে দিবস বা সময় নির্ধারণ করবেন, সিস্টেম ঠিক সেই সময়ের <strong>১ দিন বা ২ দিন আগে</strong> এবং <strong>সেই নির্দিষ্ট দিন ও মিনিটে</strong> ব্রাউজারে মিষ্টি সুর বাজিয়ে এবং আপনার আসল জিমেইল ইনবক্সে পেশাদার ফরমাল চিঠি পাঠিয়ে দেবে!</p>
+  </div>
+
+  <h3>প্ল্যাটফর্মের মূল ৫টি সেকশন (এক নজরে):</h3>
+  <table>
+    <thead>
+      <tr>
+        <th style="width: 25%;">সেকশন</th>
+        <th style="width: 25%;">কীভাবে যাবেন?</th>
+        <th style="width: 50%;">প্রধান কাজ</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>১. Landing Page</strong></td>
+        <td>টপ মেনু: <span class="pill pill-blue">Landing</span></td>
+        <td>লাইভ মেট্রিক্স, সিস্টেম স্থাপত্য ও কুইক একশন বাটন।</td>
+      </tr>
+      <tr>
+        <td><strong>২. SaaS Dashboard</strong></td>
+        <td>টপ মেনু: <span class="pill pill-green">Dashboard</span></td>
+        <td>টাইমলাইন ও গ্রিড ভিউতে আপনার সকল শিডিউল করা ইভেন্ট ও কাউন্টডাউন।</td>
+      </tr>
+      <tr>
+        <td><strong>৩. Special Days Hub</strong></td>
+        <td>টপ মেনু: <span class="pill pill-purple">Special Days BD & World</span></td>
+        <td>২৩টি জাতীয় ও আন্তর্জাতিক দিবসে ১-ক্লিকে ১-২ দিন আগের নোটিফিকেশন সাবস্ক্রাইব।</td>
+      </tr>
+      <tr>
+        <td><strong>৪. Timezone Radar</strong></td>
+        <td>টপ মেনু: <span class="pill pill-blue">Timezone Radar Live</span></td>
+        <td>ঢাকা, লন্ডন, নিউইয়র্ক, টোকিও, দুবাইয়ের লাইভ ঘড়ি ও গ্লোবাল কনভার্সন।</td>
+      </tr>
+      <tr>
+        <td><strong>৫. Admin Portal</strong></td>
+        <td>পেজের নিচে: <code>Admin Console</code></td>
+        <td>রিয়েল জিমেইল সেটআপ, অডিট লগ প্রিভিউ এবং ল্যান্ডিং পেজ কনটেন্ট এডিটর।</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="page-break"></div>
+
+  <!-- ========================================================================= -->
+  <!-- SECTION 2: STEP-BY-STEP EVENT CREATION                                    -->
+  <!-- ========================================================================= -->
+  <div class="header-bar">
+    <div class="header-logo">CueSpace Manual</div>
+    <div class="header-page-tag">অধ্যায় ২ — ইভেন্ট তৈরি ও শিডিউল</div>
+  </div>
+
+  <h2>২. একটি নতুন ইভেন্ট শিডিউল করার ধাপে ধাপে গাইড</h2>
+  <p>
+    যেকোনো সাধারণ ব্যবহারকারী নিচের ৪টি সহজ ধাপ অনুসরণ করে যেকোনো ইভেন্ট (জন্মদিন, বিবাহবার্ষিকী, ডেডলাইন) শিডিউল করতে পারবেন:
+  </p>
+
+  <div class="step-box avoid-break">
+    <div class="step-header">
+      <div class="step-number">১</div>
+      <div class="step-title">ফর্ম ওপেন করুন</div>
+    </div>
+    <p>ওয়েবসাইটের উপরে ডানপাশে থাকা বেগুনী রঙের <strong><code>+ Add Event</code></strong> বাটনে ক্লিক করুন (অথবা আপনার কীবোর্ডে শুধু <kbd>C</kbd> বা <kbd>N</kbd> চাপুন)। ডানপাশ থেকে একটি স্লাইডার ফর্ম খুলে যাবে।</p>
+  </div>
+
+  <div class="step-box avoid-break">
+    <div class="step-header">
+      <div class="step-number">২</div>
+      <div class="step-title">ইভেন্টের তথ্য দিন (Event Identity)</div>
+    </div>
+    <p>
+      * <strong>Event Title:</strong> ইভেন্টের নাম লিখুন (যেমন: <em>"তামান্নার জন্মদিন"</em> বা <em>"অফিস ট্যাক্স ফাইল ডেডলাইন"</em>)।<br>
+      * <strong>Category:</strong> ড্রপডাউন থেকে ক্যাটাগরি বেছে নিন (<span class="pill pill-blue">🎂 Birthday</span>, <span class="pill pill-green">🎯 Deadline</span>, <span class="pill pill-purple">💍 Anniversary</span> ইত্যাদি)।<br>
+      * <strong>Recurrence:</strong> প্রতি বছর রিপিট হবে কি না তা নির্ধারণ করুন (<span class="pill pill-amber">Annual</span> বা <span class="pill pill-blue">One-time Event</span>)।
+    </p>
+  </div>
+
+  <div class="step-box avoid-break">
+    <div class="step-header">
+      <div class="step-number">৩</div>
+      <div class="step-title">তারিখ, সময় ও আগাম নোটিফিকেশন (Schedule & Timing)</div>
+    </div>
+    <p>
+      * <strong>Original Date:</strong> ক্যালেন্ডার থেকে কাঙ্ক্ষিত তারিখ নির্বাচন করুন।<br>
+      * <strong>Reminder Time:</strong> কখন অ্যালার্ট চান তা নির্ধারণ করুন। (ঘণ্টা ও মিনিট)।<br>
+      * <strong>Advance Alert Timing (কত দিন আগে মেসেজ আসবে):</strong> এখানে ৪টি বাটন পাবেন:
+      <span class="pill pill-green">On The Day</span>, <span class="pill pill-blue">1 Day Before</span>, <span class="pill pill-purple">2 Days Before</span>, <span class="pill pill-amber">3 Days Before</span>। আপনি চাইলে এক বা একাধিক বাটন অন রাখতে পারেন!
+    </p>
+  </div>
+
+  <div class="step-box avoid-break">
+    <div class="step-header">
+      <div class="step-number">৪</div>
+      <div class="step-title">প্রাপকের তথ্য ও সেভ করুন (Recipient & Channels)</div>
+    </div>
+    <p>
+      * <strong>Delivery Channels:</strong> <code>✉️ Email</code> এবং <code>💬 WhatsApp</code> চালু রাখুন।<br>
+      * <strong>Recipient Name & Phone:</strong> প্রাপকের নাম ও হোয়াটসঅ্যাপ নম্বর দিন (যেমন: <code>+8801700000000</code>)।<br>
+      * <strong>Recipient Email:</strong> প্রাপকের ইমেইল অ্যাড্রেস লিখুন।<br>
+      * নিচে থাকা <strong><code>Save & Schedule</code></strong> বাটনে ক্লিক করুন।
+    </p>
+  </div>
+
+  <div class="callout callout-tip avoid-break">
+    <div class="callout-title">✅ কাজ শেষ!</div>
+    <p>আপনার ইভেন্টটি সাথে সাথে ড্যাশবোর্ডে যুক্ত হয়ে গেছে। নির্ধারিত দিন ও সময়ে সিস্টেম স্বয়ংক্রিয়ভাবে নোটিফিকেশন পাঠাবে।</p>
+  </div>
+
+  <div class="page-break"></div>
+
+  <!-- ========================================================================= -->
+  <!-- SECTION 3: 2-MINUTE INSTANT TEST TRICK                                    -->
+  <!-- ========================================================================= -->
+  <div class="header-bar">
+    <div class="header-logo">CueSpace Manual</div>
+    <div class="header-page-tag">অধ্যায় ৩ — ২ মিনিটে লাইভ টেস্ট ট্রিক</div>
+  </div>
+
+  <h2>৩. মাত্র ২ মিনিটে লাইভ টেস্ট অ্যালার্ম চেক করার সহজ উপায়</h2>
+  <p>
+    আপনি যদি এখনই স্বচক্ষে দেখতে চান যে সিস্টেমটি কীভাবে কাজ করে এবং নির্ধারিত সময়ে কীভাবে মিষ্টি রিংটোন বাজে, তবে নিচের ৩টি ধাপ ফলো করুন:
+  </p>
+
+  <div class="step-box avoid-break">
+    <div class="step-header">
+      <div class="step-number">১</div>
+      <div class="step-title">+ Add Event ফর্মটি খুলুন</div>
+    </div>
+    <p>টপ নেভবারের <strong><code>+ Add Event</code></strong> বাটনে ক্লিক করুন। ইভেন্টের নাম লিখুন <em>"আমার লাইভ টেস্ট"</em>।</p>
+  </div>
+
+  <div class="step-box avoid-break">
+    <div class="step-header">
+      <div class="step-number">২</div>
+      <div class="step-title">"⚡ 2 Mins From Now" বাটনে একটি ক্লিক করুন</div>
+    </div>
+    <p>
+      Reminder Time-এর ঠিক নিচে একটি বিশেষ নীল রঙের বাটন রয়েছে: <strong><code>⚡ 2 Mins From Now</code></strong>।<br>
+      এটিতে এক ক্লিক করলেই সিস্টেম বর্তমান ঘড়ির সময়ের সাথে ঠিক ২ মিনিট যোগ করে ২৪-ঘণ্টার ফরম্যাটে আজকের তারিখ দিয়ে সব সেট করে দেয়! (কোনো AM/PM লেখার ভুল হবে না)।
+    </p>
+  </div>
+
+  <div class="step-box avoid-break">
+    <div class="step-header">
+      <div class="step-number">৩</div>
+      <div class="step-title">Save চাপুন এবং ২ মিনিট অপেক্ষা করুন!</div>
+    </div>
+    <p>
+      নিচে <strong><code>Save & Schedule</code></strong> বাটনে চাপ দিন। আপনার ব্রাউজারটি ওপেন রাখুন।<br>
+      <strong>🔔 ফলাফল:</strong> ঠিক ২ মিনিট পূর্ণ হওয়ার সাথে সাথে আপনার স্পিকারে একটি মিষ্টি <strong>হারমোনিক রিংটোন (A5-E6 Chime)</strong> বেজে উঠবে এবং স্ক্রিনের ঠিক মাঝখানে নিচের মতো আকর্ষণীয় লাইভ অ্যালার্ম পপ-আপ হবে:
+    </p>
+  </div>
+
+  <div class="callout callout-tip avoid-break" style="border: 2px solid #6366f1; background: #faf5ff;">
+    <div class="callout-title" style="color: #4338ca; font-size: 14px;">🔔 REAL-TIME REMINDER FIRED! (অন-স্ক্রিন উইন্ডো)</div>
+    <p style="color: #1e1b4b; margin: 6px 0;">
+      <strong>Instant Test Alert (+2m)</strong><br>
+      📅 Scheduled Date: Today &bull; ⏰ Time: Exact Local Minute &bull; 🌍 Timezone: Asia/Dhaka<br>
+      <em>Delivered via: ✉️ Email Dispatched &bull; 💬 WhatsApp Prepared</em>
+    </p>
+    <div style="margin-top: 10px; display: flex; gap: 8px;">
+      <span class="pill pill-green">Send WhatsApp Wish</span>
+      <span class="pill pill-blue">Snooze 1h</span>
+      <span class="pill pill-purple">Snooze 1 Day</span>
+      <span class="pill pill-amber">Dismiss</span>
+    </div>
+  </div>
+
+  <div class="page-break"></div>
+
+  <!-- ========================================================================= -->
+  <!-- SECTION 4: SPECIAL DAYS & NATIONAL CALENDAR                               -->
+  <!-- ========================================================================= -->
+  <div class="header-bar">
+    <div class="header-logo">CueSpace Manual</div>
+    <div class="header-page-tag">অধ্যায় ৪ — বিশেষ দিবস ক্যালেন্ডার</div>
+  </div>
+
+  <h2>৪. বাংলাদেশ ও বিশ্বব্যাপী বিশেষ দিবস ক্যালেন্ডার (Special Days Hub)</h2>
+  <p>
+    CueSpace-এ বাংলাদেশ ও আন্তর্জাতিক মোট <strong>২৩টি গুরুত্বপূর্ণ দিবস</strong> আগে থেকেই যুক্ত করা আছে। আপনি যেকোনো দিবসে সাবস্ক্রাইব করলে সিস্টেম স্বয়ংক্রিয়ভাবে সেই দিবসের <strong>১ দিন এবং ২ দিন আগে</strong> আপনাকে নোটিফিকেশন পাঠাবে।
+  </p>
+
+  <h3>অন্তর্ভুক্ত প্রধান দিবসসমূহ:</h3>
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;" class="avoid-break">
+    <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 10px; padding: 12px;">
+      <h4 style="color: #166534; font-size: 13.5px; margin-bottom: 6px;">🇧🇩 বাংলাদেশ জাতীয় ও সাংস্কৃতিক দিবস (৯টি)</h4>
+      <ul style="padding-left: 18px; font-size: 12px; line-height: 1.6; color: #14532d;">
+        <li>২১শে ফেব্রুয়ারি — আন্তর্জাতিক মাতৃভাষা দিবস</li>
+        <li>১৭ই মার্চ — জাতীয় শিশু দিবস</li>
+        <li>২৬শে মার্চ — মহান স্বাধীনতা ও জাতীয় দিবস</li>
+        <li>১৪ই এপ্রিল — পহেলা বৈশাখ (বাংলা নববর্ষ)</li>
+        <li>১লা মে — আন্তর্জাতিক শ্রমিক সংহতি দিবস</li>
+        <li>১৫ই আগস্ট — জাতীয় শোক দিবস</li>
+        <li>১৬ই ডিসেম্বর — মহান বিজয় দিবস</li>
+      </ul>
+    </div>
+    <div style="background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 10px; padding: 12px;">
+      <h4 style="color: #1e40af; font-size: 13.5px; margin-bottom: 6px;">🌍 আন্তর্জাতিক ও পারিবারিক দিবস (১৪টি)</h4>
+      <ul style="padding-left: 18px; font-size: 12px; line-height: 1.6; color: #1e3a8a;">
+        <li>৮ই মার্চ — আন্তর্জাতিক নারী দিবস</li>
+        <li>মে মাসের ২য় রবিবার — বিশ্ব মা দিবস</li>
+        <li>জুন মাসের ৩য় রবিবার — বিশ্ব বাবা দিবস</li>
+        <li>১৯শে নভেম্বর — আন্তর্জাতিক পুরুষ দিবস</li>
+        <li>৫ই অক্টোবর — বিশ্ব শিক্ষক দিবস</li>
+        <li>১৪ই ফেব্রুয়ারি — বিশ্ব ভালোবাসা দিবস</li>
+        <li>২৫শে ডিসেম্বর — শুভ বড়দিন (ক্রিসমাস)</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3 style="margin-top: 24px;">কীভাবে ১-ক্লিকে সাবস্ক্রাইব করবেন?</h3>
+  <div class="step-box avoid-break">
+    <div class="step-header">
+      <div class="step-number">১</div>
+      <div class="step-title">Special Days মেনুতে যান</div>
+    </div>
+    <p>উপরে থাকা <strong><code>Special Days BD & World</code></strong> ট্যাবে ক্লিক করুন।</p>
+  </div>
+  <div class="step-box avoid-break">
+    <div class="step-header">
+      <div class="step-number">২</div>
+      <div class="step-title">এক ক্লিকে সকল দিবস বেছে নিন</div>
+    </div>
+    <p>উপরে দুটি বিশেষ বাটন রয়েছে: <strong><code>🇧🇩 Subscribe All BD Days (9)</code></strong> এবং <strong><code>🌍 Subscribe All Global (14)</code></strong>।<br>বাটনে চাপ দিয়ে আপনার ইমেইল ও ফোন নম্বর দিলে সাথে সাথে সবগুলো দিবসের ১-২ দিন আগের নোটিফিকেশন অ্যাক্টিভ হয়ে যাবে!</p>
+  </div>
+
+  <div class="page-break"></div>
+
+  <!-- ========================================================================= -->
+  <!-- SECTION 5: REAL GMAIL SMTP SETUP                                          -->
+  <!-- ========================================================================= -->
+  <div class="header-bar">
+    <div class="header-logo">CueSpace Manual</div>
+    <div class="header-page-tag">অধ্যায় ৫ — জিমেইল ও আসল ইমেইল সেটআপ</div>
+  </div>
+
+  <h2>৫. নিজের জিমেইল কানেক্ট করে আসল ইমেইল ইনবক্সে পাওয়ার উপায়</h2>
+  <p>
+    আপনার নিজের কিংবা বন্ধুদের আসল জিমেইল ইনবক্সে CueSpace থেকে সুন্দর অফিসিয়াল চিঠি পাঠাতে মাত্র ৩টি ধাপ অনুসরণ করুন:
+  </p>
+
+  <div class="step-box avoid-break">
+    <div class="step-header">
+      <div class="step-number">১</div>
+      <div class="step-title">গুগল থেকে ১৬ অক্ষরের অ্যাপ পাসওয়ার্ড নিন</div>
+    </div>
+    <p>
+      ১. আপনার ব্রাউজারে যান: <strong><a href="https://myaccount.google.com/apppasswords" target="_blank">myaccount.google.com/apppasswords</a></strong> (আপনার গুগল একাউন্টে ২-স্টেপ ভেরিফিকেশন অন থাকতে হবে)।<br>
+      ২. App Name ঘরে লিখুন <strong>"CueSpace"</strong> এবং <strong>Create</strong> চাপুন।<br>
+      ৩. গুগল আপনাকে একটি ১৬ অক্ষরের কোড দেবে (যেমন: <code>abcd efgh ijkl mnop</code>)। এটি কপি করে নিন।
+    </p>
+  </div>
+
+  <div class="step-box avoid-break">
+    <div class="step-header">
+      <div class="step-number">২</div>
+      <div class="step-title">CueSpace অ্যাডমিনে সেভ করুন</div>
+    </div>
+    <p>
+      ১. CueSpace পেজের নিচে থাকা <strong><code>Admin Console</code></strong> বাটনে ক্লিক করুন (অথবা ল্যান্ডিং পেজের <em>Admin CMS Login</em> চাপুন)।<br>
+      ২. অ্যাডমিন পোর্টাল থেকে <strong><code>Real Email & SMTP</code></strong> ট্যাবে যান।<br>
+      ৩. <strong>Gmail Sender Address</strong>-এ আপনার জিমেইল আইডি দিন এবং পাসওয়ার্ডের ঘরে সেই ১৬ অক্ষরের কোডটি পেস্ট করুন।<br>
+      ৪. <strong>Enable Real Email Dispatch</strong> চেকবক্স অন করে <strong><code>Save & Activate Real Email</code></strong> চাপুন।
+    </p>
+  </div>
+
+  <div class="step-box avoid-break">
+    <div class="step-header">
+      <div class="step-number">৩</div>
+      <div class="step-title">ইনস্ট্যান্ট টেস্ট ইমেইল পাঠিয়ে যাচাই করুন</div>
+    </div>
+    <p>
+      একই পেজের বামপাশে <strong>Send Real Test Email</strong> বক্সে আপনার নিজের যেকোনো ইমেইল লিখে <strong><code>Send Real Test Email Now</code></strong> বাটনে চাপ দিন।<br>
+      কয়েক সেকেন্ডের ভেতর আপনার জিমেইল ইনবক্সে CueSpace-এর কালারফুল ভেরিফিকেশন ইমেইল ঢুকে যাবে!
+    </p>
+  </div>
+
+  <div class="callout callout-warning avoid-break">
+    <div class="callout-title">⚠️ বিশেষ টিপস</div>
+    <p>যদি ইনবক্সে সরাসরি ইমেইল না পান, তবে আপনার জিমেইলের <strong>"Promotions"</strong> বা <strong>"Spam"</strong> ফোল্ডার চেক করুন এবং সেটিকে <em>"Not Spam"</em> বা <em>"Inbox"</em>-এ মুভ করে নিন।</p>
+  </div>
+
+  <div class="page-break"></div>
+
+  <!-- ========================================================================= -->
+  <!-- SECTION 6: WHATSAPP, TEMPLATES & SHORTCUTS                                -->
+  <!-- ========================================================================= -->
+  <div class="header-bar">
+    <div class="header-logo">CueSpace Manual</div>
+    <div class="header-page-tag">অধ্যায় ৬ — হোয়াটসঅ্যাপ ও শর্টকাট গাইড</div>
+  </div>
+
+  <h2>৬. হোয়াটসঅ্যাপ উইশ ও প্রো-টিপস</h2>
+
+  <h3>১-ক্লিক হোয়াটসঅ্যাপ শুভেচ্ছা বার্তা পাঠানোর নিয়ম:</h3>
+  <p>
+    CueSpace-এ প্রতিটি ইভেন্ট কার্ডে এবং নির্ধারিত সময়ে পপ-আপ হওয়া অ্যালার্ম মডালে একটি সবুজ রঙের <strong>"WhatsApp"</strong> বাটন থাকে।
+  </p>
+  <div class="callout callout-tip avoid-break">
+    <p>বাটনে চাপ দিলেই প্রাপকের ফোন নম্বর সহ স্বয়ংক্রিয়ভাবে তৈরি হওয়া শুভেচ্ছা বার্তাটি আপনার WhatsApp Web বা মোবাইলের হোয়াটসঅ্যাপ অ্যাপে রেডি হয়ে ওপেন হয়ে যায়। আপনাকে আলাদা করে মেসেজ টাইপ করতে হবে না—শুধু একটি এন্টার চাপলেই সেন্ড হয়ে যাবে!</p>
+  </div>
+
+  <h3>কীবোর্ড শর্টকাট গাইড (দ্রুত কাজ করার জন্য):</h3>
+  <table>
+    <thead>
+      <tr>
+        <th style="width: 30%;">কীবোর্ড শর্টকাট</th>
+        <th style="width: 70%;">কী কাজ করে?</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><kbd>Ctrl + K</kbd> বা <kbd>Cmd + K</kbd></td>
+        <td>সুপারফাস্ট <strong>Command Palette (HUD)</strong> খুলে যায়, যার মাধ্যমে যেকোনো ইভেন্ট খোঁজা বা এক ক্লিকে যেকোনো পেজে চলে যাওয়া যায়।</td>
+      </tr>
+      <tr>
+        <td><kbd>C</kbd> বা <kbd>N</kbd></td>
+        <td>যেকোনো সময় সরাসরি নতুন ইভেন্ট তৈরির ড্রয়ার ওপেন করে।</td>
+      </tr>
+      <tr>
+        <td><kbd>Esc</kbd></td>
+        <td>যেকোনো খোলা ড্রয়ার, মডাল বা অ্যালার্ম পপ-আপ তাৎক্ষণিক বন্ধ করে।</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>সাধারণ প্রশ্ন ও সমাধান (FAQ):</h3>
+  <div class="avoid-break" style="margin-top: 14px;">
+    <p><strong>প্রশ্ন ১: আমি সময় দিয়েছিলাম কিন্তু অ্যালার্ট বাজল না কেন?</strong><br>
+    <em>উত্তর:</em> ঘড়ির সময় সাধারণত ২৪-ঘণ্টা ভিত্তিক (24-Hour Format)। আপনি যদি রাত ৮:৩৫ এ অ্যালার্ট চান, তবে সময় হবে <code>20:35</code>। ভুল এড়াতে সবসময় <strong><code>⚡ 2 Mins From Now</code></strong> বাটন ব্যবহার করুন।</p>
+
+    <p><strong>প্রশ্ন ২: ফোন নম্বর দেওয়ার সঠিক নিয়ম কী?</strong><br>
+    <em>উত্তর:</em> দেশের কান্ট্রি কোড সহ নম্বর লিখুন (যেমন বাংলাদেশের জন্য: <code>+8801700000000</code>)।</p>
+
+    <p><strong>প্রশ্ন ৩: পাঠানো মেসেজের হিস্ট্রি কোথায় পাব?</strong><br>
+    <em>উত্তর:</em> পেজের নিচে <code>Admin Console</code>-এ গিয়ে <strong>Audit Logs</strong> ট্যাবে যান। সেখানে কখন কার কাছে ইমেইল বা হোয়াটসঅ্যাপ বার্তা গেছে তা দেখতে পাবেন এবং <em>"View Content"</em> বাটনে চাপ দিয়ে হুবহু মেসেজটি পড়তে পারবেন।</p>
+  </div>
+
+  <div style="margin-top: 40px; text-align: center; border-top: 1px solid #e2e8f0; padding-top: 20px; color: #64748b; font-size: 12px;">
+    <strong>CueSpace Autonomous Timezone & Smart Event SaaS</strong> &bull; Developed by Antigravity AI &bull; Linear & Vercel Design Aesthetic
+  </div>
+
+</body>
+</html>

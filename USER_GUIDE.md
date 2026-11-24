@@ -1,6 +1,9 @@
 # CueSpace — সম্পূর্ণ ইউজার গাইডলাইন ও সিস্টেম ম্যানুয়াল
 *স্বয়ংক্রিয়, টাইমজোন-সচেতন স্মার্ট ইভেন্ট, স্পেশাল ডে ক্যালেন্ডার ও মাল্টি-চ্যানেল নোটিফিকেশন ইঞ্জিন*
 
+> 📄 **অফিসিয়াল প্রিন্ট ও ডাউনলোডযোগ্য PDF ম্যানুয়াল:** [CueSpace_Complete_User_Guide.pdf](file:///d:/CueSpace/CueSpace_Complete_User_Guide.pdf)  
+> 🌐 **ব্রাউজারে সরাসরি পড়ার HTML গাইড:** [CueSpace_Complete_User_Guide.html](file:///d:/CueSpace/CueSpace_Complete_User_Guide.html)
+
 ---
 
 ## ১. ভূমিকা ও প্ল্যাটফর্ম পরিচিতি (Introduction & Architecture)
