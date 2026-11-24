@@ -161,10 +161,12 @@ export const SlideOverDrawer: React.FC<SlideOverDrawerProps> = ({
               </div>
 
               <div>
-                <label className={`block text-xs font-medium mb-1.5 ${textMuted}`}>
+                <label htmlFor="drawer_event_title" className={`block text-xs font-medium mb-1.5 ${textMuted}`}>
                   Event Title *
                 </label>
                 <input
+                  id="drawer_event_title"
+                  name="title"
                   type="text"
                   required
                   placeholder="e.g. Sarah's 30th Birthday / Tax Return"
@@ -176,8 +178,10 @@ export const SlideOverDrawer: React.FC<SlideOverDrawerProps> = ({
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className={`block text-xs font-medium mb-1.5 ${textMuted}`}>Category</label>
+                  <label htmlFor="drawer_event_category" className={`block text-xs font-medium mb-1.5 ${textMuted}`}>Category</label>
                   <select
+                    id="drawer_event_category"
+                    name="category"
                     value={formData.category}
                     onChange={(e) => setFormData({ ...formData, category: e.target.value as EventCategory })}
                     className={`w-full rounded-xl px-3 py-2.5 text-xs focus:outline-none border ${selectBg}`}
@@ -192,8 +196,10 @@ export const SlideOverDrawer: React.FC<SlideOverDrawerProps> = ({
                 </div>
 
                 <div>
-                  <label className={`block text-xs font-medium mb-1.5 ${textMuted}`}>Recurrence</label>
+                  <label htmlFor="drawer_recurrence_type" className={`block text-xs font-medium mb-1.5 ${textMuted}`}>Recurrence</label>
                   <select
+                    id="drawer_recurrence_type"
+                    name="recurrence_type"
                     value={formData.recurrence_type}
                     onChange={(e) => setFormData({ ...formData, recurrence_type: e.target.value })}
                     className={`w-full rounded-xl px-3 py-2.5 text-xs focus:outline-none border ${selectBg}`}
@@ -206,8 +212,10 @@ export const SlideOverDrawer: React.FC<SlideOverDrawerProps> = ({
               </div>
 
               <div>
-                <label className={`block text-xs font-medium mb-1.5 ${textMuted}`}>Description (Optional)</label>
+                <label htmlFor="drawer_description" className={`block text-xs font-medium mb-1.5 ${textMuted}`}>Description (Optional)</label>
                 <textarea
+                  id="drawer_description"
+                  name="description"
                   rows={2}
                   placeholder="Add notes, gift ideas, or checklist..."
                   value={formData.description || ''}
@@ -226,8 +234,10 @@ export const SlideOverDrawer: React.FC<SlideOverDrawerProps> = ({
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className={`block text-xs font-medium mb-1.5 ${textMuted}`}>Original Date *</label>
+                  <label htmlFor="drawer_original_date" className={`block text-xs font-medium mb-1.5 ${textMuted}`}>Original Date *</label>
                   <input
+                    id="drawer_original_date"
+                    name="original_date"
                     type="date"
                     required
                     value={formData.original_date}
@@ -236,8 +246,10 @@ export const SlideOverDrawer: React.FC<SlideOverDrawerProps> = ({
                   />
                 </div>
                 <div>
-                  <label className={`block text-xs font-medium mb-1.5 ${textMuted}`}>Reminder Time (Local)</label>
+                  <label htmlFor="drawer_reminder_time" className={`block text-xs font-medium mb-1.5 ${textMuted}`}>Reminder Time (Local)</label>
                   <input
+                    id="drawer_reminder_time"
+                    name="reminder_time"
                     type="time"
                     required
                     value={formData.reminder_time.slice(0, 5)}
@@ -269,11 +281,13 @@ export const SlideOverDrawer: React.FC<SlideOverDrawerProps> = ({
 
               {/* Timezone */}
               <div>
-                <label className={`block text-xs font-medium mb-1.5 flex items-center gap-1.5 ${textMuted}`}>
+                <label htmlFor="drawer_timezone" className={`block text-xs font-medium mb-1.5 flex items-center gap-1.5 ${textMuted}`}>
                   <Globe className="w-3.5 h-3.5 text-indigo-400" />
                   Target Timezone
                 </label>
                 <select
+                  id="drawer_timezone"
+                  name="timezone"
                   value={formData.timezone}
                   onChange={(e) => setFormData({ ...formData, timezone: e.target.value })}
                   className={`w-full rounded-xl px-3 py-2.5 text-xs focus:outline-none border ${selectBg}`}
@@ -289,8 +303,10 @@ export const SlideOverDrawer: React.FC<SlideOverDrawerProps> = ({
 
               {/* Calendar System */}
               <div>
-                <label className={`block text-xs font-medium mb-1.5 ${textMuted}`}>Calendar System</label>
+                <label htmlFor="drawer_calendar_type" className={`block text-xs font-medium mb-1.5 ${textMuted}`}>Calendar System</label>
                 <select
+                  id="drawer_calendar_type"
+                  name="calendar_type"
                   value={formData.calendar_type}
                   onChange={(e) => setFormData({ ...formData, calendar_type: e.target.value as CalendarType })}
                   className={`w-full rounded-xl px-3 py-2.5 text-xs focus:outline-none border ${selectBg}`}
@@ -439,8 +455,10 @@ export const SlideOverDrawer: React.FC<SlideOverDrawerProps> = ({
               <div className="space-y-3">
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className={`block text-xs font-medium mb-1.5 ${textMuted}`}>Recipient Name</label>
+                    <label htmlFor="drawer_recipient_name" className={`block text-xs font-medium mb-1.5 ${textMuted}`}>Recipient Name</label>
                     <input
+                      id="drawer_recipient_name"
+                      name="recipient_name"
                       type="text"
                       placeholder="e.g. Tamanna Rahman"
                       value={formData.recipient_name || ''}
@@ -449,8 +467,10 @@ export const SlideOverDrawer: React.FC<SlideOverDrawerProps> = ({
                     />
                   </div>
                   <div>
-                    <label className={`block text-xs font-medium mb-1.5 ${textMuted}`}>Phone (WhatsApp)</label>
+                    <label htmlFor="drawer_recipient_phone" className={`block text-xs font-medium mb-1.5 ${textMuted}`}>Phone (WhatsApp)</label>
                     <input
+                      id="drawer_recipient_phone"
+                      name="recipient_phone"
                       type="text"
                       placeholder="+8801633518042"
                       value={formData.recipient_phone || ''}
@@ -461,12 +481,14 @@ export const SlideOverDrawer: React.FC<SlideOverDrawerProps> = ({
                 </div>
 
                 <div>
-                  <label className={`block text-xs font-medium mb-1.5 ${textMuted}`}>
+                  <label htmlFor="drawer_recipient_email" className={`block text-xs font-medium mb-1.5 ${textMuted}`}>
                     Recipient Email <span className="text-[10px] text-purple-400 font-normal">(for Formal Email Dispatch)</span>
                   </label>
                   <div className="relative">
                     <Mail className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500" />
                     <input
+                      id="drawer_recipient_email"
+                      name="recipient_email"
                       type="email"
                       placeholder="tamanna@example.com"
                       value={formData.recipient_email || ''}
@@ -499,8 +521,10 @@ export const SlideOverDrawer: React.FC<SlideOverDrawerProps> = ({
                 </div>
 
                 <div>
-                  <label className={`block text-[11px] mb-1.5 ${textMuted}`}>Choose Email Template</label>
+                  <label htmlFor="drawer_template_select" className={`block text-[11px] mb-1.5 ${textMuted}`}>Choose Email Template</label>
                   <select
+                    id="drawer_template_select"
+                    name="template_select"
                     value={selectedTemplateId}
                     onChange={(e) => {
                       const selId = e.target.value;
@@ -519,8 +543,10 @@ export const SlideOverDrawer: React.FC<SlideOverDrawerProps> = ({
                 </div>
 
                 <div>
-                  <label className={`block text-[11px] mb-1.5 ${textMuted}`}>Formal Message Body (Customizable)</label>
+                  <label htmlFor="drawer_template_body" className={`block text-[11px] mb-1.5 ${textMuted}`}>Formal Message Body (Customizable)</label>
                   <textarea
+                    id="drawer_template_body"
+                    name="template_body"
                     rows={4}
                     value={customEmailBody}
                     onChange={(e) => setCustomEmailBody(e.target.value)}

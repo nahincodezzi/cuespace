@@ -903,10 +903,12 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
 
                 <form onSubmit={handleSendTestEmail} className="space-y-3.5">
                   <div>
-                    <label className={`block text-xs font-semibold mb-1 ${textPrimary}`}>
+                    <label htmlFor="admin_test_recipient_email" className={`block text-xs font-semibold mb-1 ${textPrimary}`}>
                       Your Email Address (Recipient) *
                     </label>
                     <input
+                      id="admin_test_recipient_email"
+                      name="test_recipient_email"
                       type="email"
                       required
                       placeholder="e.g. yourname@gmail.com"
@@ -973,10 +975,12 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
 
               <form onSubmit={handleSaveSmtp} className="space-y-3.5">
                 <div>
-                  <label className={`block text-xs font-semibold mb-1 ${textPrimary}`}>
+                  <label htmlFor="admin_smtp_user" className={`block text-xs font-semibold mb-1 ${textPrimary}`}>
                     Gmail Sender Address *
                   </label>
                   <input
+                    id="admin_smtp_user"
+                    name="smtp_user"
                     type="email"
                     required
                     placeholder="your_email@gmail.com"
@@ -989,10 +993,12 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                 </div>
 
                 <div>
-                  <label className={`block text-xs font-semibold mb-1 ${textPrimary}`}>
+                  <label htmlFor="admin_smtp_password" className={`block text-xs font-semibold mb-1 ${textPrimary}`}>
                     Google 16-Character App Password *
                   </label>
                   <input
+                    id="admin_smtp_password"
+                    name="smtp_password"
                     type="password"
                     required
                     placeholder="e.g. abcd efgh ijkl mnop"

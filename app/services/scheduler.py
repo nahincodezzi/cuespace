@@ -56,8 +56,11 @@ async def in_process_scan_and_dispatch() -> int:
         
         for event in due_events:
             channels = event.channels or {}
-            recip_email = event.recipient_email or (event.user.email if event.user else "recipient@cuespace.app")
-            recip_phone = event.recipient_phone or (event.user.phone_number if event.user else "+8801700000000")
+            user_email = event.user.email if (event.user and event.user.email) else None
+            recip_email = event.recipient_email or user_email or "recipient@cuespace.app"
+            
+            user_phone = event.user.phone_number if (event.user and event.user.phone_number) else None
+            recip_phone = event.recipient_phone or user_phone or "+8801700000000"
             greeting_name = event.recipient_name or "Valued Guest"
             
             token_3h = generate_signed_action_token({"event_id": str(event.id), "snooze_hours": 3})
