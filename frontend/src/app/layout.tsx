@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
@@ -12,13 +12,18 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  themeColor: "#08080d",
+};
+
 export const metadata: Metadata = {
   title: "CueSpace — Autonomous Timezone & Smart Event SaaS",
   description: "Never miss a moment. Timezone-aware smart event tracking for birthdays, anniversaries and deadlines with 1-click snooze and multi-channel delivery.",
   keywords: ["event reminders", "timezone scheduler", "smart calendar", "birthday tracker", "1-click snooze", "FastAPI Next.js SaaS"],
   authors: [{ name: "CueSpace Core Team" }],
-  viewport: { width: "device-width", initialScale: 1, maximumScale: 1 },
-  themeColor: "#08080d",
   openGraph: {
     title: "CueSpace — Autonomous Timezone & Smart Event SaaS",
     description: "Never miss a moment. High-reliability timezone-aware notifications across Email, WhatsApp & SMS.",

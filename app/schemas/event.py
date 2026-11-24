@@ -69,6 +69,30 @@ class EventUpdate(BaseModel):
     is_active: Optional[bool] = None
     tag_ids: Optional[List[uuid.UUID]] = None
 
+    @field_validator("timezone")
+    @classmethod
+    def validate_timezone(cls, v: Optional[str]) -> Optional[str]:
+        if v is not None and v not in pytz.all_timezones:
+            raise ValueError(f"Invalid timezone: '{v}'. Must be a standard IANA timezone.")
+        return v
+
+    @field_validator("calendar_type")
+    @classmethod
+    def validate_calendar(cls, v: Optional[str]) -> Optional[str]:
+        if v is not None:
+            valid = {"GREGORIAN", "HIJRI", "BENGALI"}
+            if v.upper() not in valid:
+                raise ValueError(f"Calendar must be one of {valid}")
+            return v.upper()
+        return v
+
+    @field_validator("recurrence_interval")
+    @classmethod
+    def validate_interval(cls, v: Optional[int]) -> Optional[int]:
+        if v is not None and v < 1:
+            raise ValueError("recurrence_interval must be >= 1")
+        return v
+
 
 class EventResponse(EventBase):
     id: uuid.UUID
