@@ -52,35 +52,35 @@ export const InspectPanel: React.FC<InspectPanelProps> = ({
   };
 
   return (
-    <div className="h-full p-6 sm:p-7 rounded-[22px] border border-[var(--border)] bg-[var(--surface)] backdrop-blur-xl shadow-[var(--shadow)] flex flex-col justify-between">
+    <div className="h-full p-4 sm:p-6 lg:p-7 rounded-2xl sm:rounded-[22px] border border-[var(--border)] bg-[var(--surface)] backdrop-blur-xl shadow-[var(--shadow)] flex flex-col justify-between">
       <div>
         {/* Header with aria-live for accessibility */}
-        <div className="flex items-center justify-between pb-4 border-b border-[var(--border)] mb-4">
-          <div>
-            <span className="text-[10px] uppercase font-mono font-bold tracking-wider text-[var(--muted-2)] block">
+        <div className="flex items-center justify-between pb-3 sm:pb-4 border-b border-[var(--border)] mb-3 sm:mb-4 gap-2">
+          <div className="min-w-0">
+            <span className="text-[9px] sm:text-[10px] uppercase font-mono font-bold tracking-wider text-[var(--muted-2)] block">
               Inspecting Zone
             </span>
             <h3
               aria-live="polite"
-              className="text-lg sm:text-xl font-bold tracking-tight text-[var(--fg)] mt-0.5"
+              className="text-base sm:text-lg lg:text-xl font-bold tracking-tight text-[var(--fg)] mt-0.5 truncate max-w-[150px] xs:max-w-[190px] sm:max-w-none"
             >
               {zoneName}
             </h3>
           </div>
 
           {/* Odometer Clock */}
-          <div className="text-right">
-            <span className="text-[10px] uppercase font-mono font-bold tracking-wider text-[var(--muted-2)] block">
+          <div className="text-right shrink-0">
+            <span className="text-[9px] sm:text-[10px] uppercase font-mono font-bold tracking-wider text-[var(--muted-2)] block">
               Wall Time
             </span>
-            <div className="text-base sm:text-lg font-bold text-[var(--accent-text)]">
+            <div className="text-sm sm:text-base lg:text-lg font-bold text-[var(--accent-text)]">
               <Odometer value={timeString} />
             </div>
           </div>
         </div>
 
         {/* Zone Overview Note */}
-        <p className="text-xs text-[var(--muted)] leading-relaxed mb-4">
+        <p className="text-xs text-[var(--muted)] leading-relaxed mb-3 sm:mb-4">
           Reminders in this zone are converted to UTC at runtime taking into account local Daylight Saving Time rules.
         </p>
 
@@ -140,10 +140,10 @@ export const InspectPanel: React.FC<InspectPanelProps> = ({
       {/* Quick Add Button */}
       <button
         onClick={onOpenAddEvent}
-        className="mt-4 w-full py-2.5 px-4 rounded-xl text-xs font-bold border border-[var(--border)] bg-[var(--surface-strong)] hover:border-[var(--accent)] hover:text-[var(--accent-text)] text-[var(--fg)] transition-all flex items-center justify-center gap-2 cursor-pointer shadow-xs"
+        className="mt-4 w-full py-2.5 px-3 sm:px-4 rounded-xl text-xs font-bold border border-[var(--border)] bg-[var(--surface-strong)] hover:border-[var(--accent)] hover:text-[var(--accent-text)] text-[var(--fg)] transition-all flex items-center justify-center gap-2 cursor-pointer shadow-xs"
       >
-        <Plus className="w-3.5 h-3.5" />
-        <span>Schedule Event for {zoneName}</span>
+        <Plus className="w-3.5 h-3.5 shrink-0" />
+        <span className="truncate">Schedule Event for {zoneName.split('/').pop()?.replace('_', ' ') || zoneName}</span>
       </button>
     </div>
   );

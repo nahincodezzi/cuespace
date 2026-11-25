@@ -45,8 +45,8 @@ export const Hero: React.FC<HeroProps> = ({
           </Reveal>
 
           {/* Staged H1 Headline */}
-          <h1 className="text-4xl sm:text-6xl lg:text-[76px] font-bold tracking-[-0.045em] leading-[1.02] text-[var(--fg)]">
-            <span className="inline-flex flex-wrap gap-x-3 gap-y-1">
+          <h1 className="text-3xl sm:text-5xl lg:text-[76px] font-bold tracking-[-0.045em] leading-[1.05] sm:leading-[1.02] text-[var(--fg)]">
+            <span className="inline-flex flex-wrap gap-x-2.5 sm:gap-x-3 gap-y-1">
               {headlineWords.map((word, idx) => (
                 <Reveal key={word} i={idx + 1} className="inline-block">
                   {word}
@@ -62,44 +62,47 @@ export const Hero: React.FC<HeroProps> = ({
 
           {/* Sub-Copy */}
           <Reveal i={5}>
-            <p className="text-base sm:text-lg text-[var(--muted)] max-w-xl leading-relaxed">
+            <p className="text-sm sm:text-base lg:text-lg text-[var(--muted)] max-w-xl leading-relaxed">
               Timezone-aware smart event tracking for birthdays, anniversaries, and critical milestones. Automated multi-channel dispatch via Email, WhatsApp & SMS with stateless 1-click snooze.
             </p>
           </Reveal>
 
           {/* Action CTAs */}
           <Reveal i={6}>
-            <div className="flex flex-wrap items-center gap-3.5 pt-2">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-3 pt-2">
               <Magnetic maxDistance={6}>
                 <button
                   onClick={onOpenAddEvent}
-                  className="px-6 py-3.5 rounded-xl text-sm font-bold text-white bg-gradient-to-r from-[#7C3AED] to-[#6366F1] hover:shadow-[0_0_28px_rgba(124,58,237,0.45)] transition-all flex items-center gap-2 group cursor-pointer"
+                  className="w-full sm:w-auto px-6 py-3.5 rounded-xl text-sm font-bold text-white bg-gradient-to-r from-[#7C3AED] to-[#6366F1] hover:shadow-[0_0_28px_rgba(124,58,237,0.45)] transition-all flex items-center justify-center gap-2 group cursor-pointer"
                 >
                   <span>Schedule First Event</span>
                   <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
                 </button>
               </Magnetic>
 
-              <button
-                onClick={onOpenDashboard}
-                className="px-5 py-3.5 rounded-xl text-sm font-semibold border border-[var(--border)] bg-[var(--surface)] hover:bg-[var(--surface-strong)] text-[var(--fg)] hover:text-[var(--accent-text)] shadow-xs transition-colors flex items-center gap-2 cursor-pointer"
-              >
-                <Compass className="w-4 h-4 text-[var(--accent-text)]" />
-                <span>Open Dashboard</span>
-              </button>
+              <div className="flex items-center gap-2.5 w-full sm:w-auto">
+                <button
+                  onClick={onOpenDashboard}
+                  className="flex-1 sm:flex-none px-4 sm:px-5 py-3.5 rounded-xl text-sm font-semibold border border-[var(--border)] bg-[var(--surface)] hover:bg-[var(--surface-strong)] text-[var(--fg)] hover:text-[var(--accent-text)] shadow-xs transition-colors flex items-center justify-center gap-2 cursor-pointer"
+                >
+                  <Compass className="w-4 h-4 text-[var(--accent-text)]" />
+                  <span>Open Dashboard</span>
+                </button>
 
-              <button
-                onClick={onOpenAdmin}
-                className="px-4 py-3.5 rounded-xl text-xs font-semibold text-[var(--muted)] hover:text-[var(--fg)] transition-colors cursor-pointer"
-              >
-                <span>Admin CMS</span>
-              </button>
+                <button
+                  onClick={onOpenAdmin}
+                  className="px-3.5 sm:px-4 py-3.5 rounded-xl text-xs font-semibold text-[var(--muted)] hover:text-[var(--fg)] transition-colors cursor-pointer text-center"
+                >
+                  <span>Admin CMS</span>
+                </button>
+              </div>
             </div>
           </Reveal>
 
-          {/* Mobile Toast Stack Preview */}
-          <div className="lg:hidden pt-4 flex justify-center">
+          {/* Mobile Toast Stack & Wall Clock Preview */}
+          <div className="lg:hidden pt-4 flex flex-col items-center gap-3 w-full">
             <NotificationStack />
+            <WallClock />
           </div>
 
         </div>

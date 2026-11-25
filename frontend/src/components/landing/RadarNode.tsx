@@ -46,26 +46,26 @@ export const RadarNode: React.FC<RadarNodeProps> = ({
       <button
         onClick={onClick}
         aria-label={`${node.name}: ${timeString}`}
-        className={`group relative flex flex-col items-center p-2 rounded-2xl transition-all duration-300 border select-none ${
+        className={`group relative flex flex-col items-center px-1.5 py-1 sm:p-2 rounded-xl sm:rounded-2xl transition-all duration-300 border select-none ${
           isActive
             ? 'bg-[var(--node-active)] border-[var(--node-active-border)] shadow-[0_0_20px_var(--node-active-border)] scale-105'
             : 'bg-[var(--node-bg)] border-[var(--border)] hover:border-[var(--accent)] shadow-xs hover:scale-102'
         }`}
       >
         {/* Glowing Center Dot */}
-        <div className="flex items-center gap-1.5 mb-1">
+        <div className="flex items-center gap-1 sm:gap-1.5 mb-0.5 sm:mb-1">
           <span
-            className={`w-2 h-2 rounded-full transition-transform ${
+            className={`w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full transition-transform ${
               isActive ? 'bg-[var(--accent)] scale-125' : 'bg-[var(--muted)] group-hover:bg-[var(--accent)]'
             }`}
           />
-          <span className="text-[11px] sm:text-xs font-bold tracking-tight text-[var(--fg)]">
+          <span className="text-[10px] sm:text-xs font-bold tracking-tight text-[var(--fg)] whitespace-nowrap">
             {node.name}
           </span>
         </div>
 
         {/* Live Local Time */}
-        <span className="text-[10px] font-mono font-semibold text-[var(--muted-2)] tabular-nums">
+        <span className="text-[8.5px] sm:text-[10px] font-mono font-semibold text-[var(--muted-2)] tabular-nums">
           {timeString}
         </span>
       </button>

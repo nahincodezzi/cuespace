@@ -72,7 +72,7 @@ const FeatureCard: React.FC<{ feat: (typeof FEATURES)[0]; i: number }> = ({ feat
         onMouseMove={handleMouseMove}
         onMouseLeave={handleMouseLeave}
         style={{ rotateX: springX, rotateY: springY, transformPerspective: 800 }}
-        className="h-full p-6 sm:p-7 rounded-[20px] border border-[var(--border)] bg-[var(--surface)] hover:bg-[var(--surface-strong)] transition-colors duration-300 hover:border-[var(--accent)] hover:shadow-[var(--shadow)] flex flex-col justify-between group"
+        className="h-full p-4 sm:p-6 lg:p-7 rounded-2xl sm:rounded-[20px] border border-[var(--border)] bg-[var(--surface)] hover:bg-[var(--surface-strong)] transition-colors duration-300 hover:border-[var(--accent)] hover:shadow-[var(--shadow)] flex flex-col justify-between group"
       >
         <div>
           {/* Top Row: Icon & Tag */}

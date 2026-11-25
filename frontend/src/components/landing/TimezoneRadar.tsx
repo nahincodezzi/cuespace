@@ -13,11 +13,11 @@ interface TimezoneRadarProps {
 }
 
 const RADAR_CITIES: CityNodeData[] = [
-  { id: 'dhaka', name: 'Dhaka', timezone: 'Asia/Dhaka', angle: 285, radiusPercent: 36 },
-  { id: 'dubai', name: 'Dubai', timezone: 'Asia/Dubai', angle: 235, radiusPercent: 42 },
-  { id: 'london', name: 'London', timezone: 'Europe/London', angle: 130, radiusPercent: 38 },
-  { id: 'newyork', name: 'New York', timezone: 'America/New_York', angle: 185, radiusPercent: 44 },
-  { id: 'tokyo', name: 'Tokyo', timezone: 'Asia/Tokyo', angle: 335, radiusPercent: 32 },
+  { id: 'dhaka', name: 'Dhaka', timezone: 'Asia/Dhaka', angle: 285, radiusPercent: 35 },
+  { id: 'dubai', name: 'Dubai', timezone: 'Asia/Dubai', angle: 235, radiusPercent: 36 },
+  { id: 'london', name: 'London', timezone: 'Europe/London', angle: 130, radiusPercent: 36 },
+  { id: 'newyork', name: 'New York', timezone: 'America/New_York', angle: 185, radiusPercent: 33 },
+  { id: 'tokyo', name: 'Tokyo', timezone: 'Asia/Tokyo', angle: 340, radiusPercent: 34 },
 ];
 
 export const TimezoneRadar: React.FC<TimezoneRadarProps> = ({ events, onOpenAddEvent }) => {
@@ -98,10 +98,10 @@ export const TimezoneRadar: React.FC<TimezoneRadarProps> = ({ events, onOpenAddE
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
         
         {/* Left: Radar Visualizer */}
-        <div className="lg:col-span-7 flex justify-center">
+        <div className="lg:col-span-7 flex justify-center w-full overflow-hidden px-2 sm:px-0">
           <div
             ref={radarRef}
-            className="relative w-full max-w-[460px] aspect-square rounded-full border border-[var(--border)] bg-[var(--surface)] shadow-[var(--shadow)] overflow-hidden flex items-center justify-center select-none"
+            className="relative w-full max-w-[340px] sm:max-w-[420px] lg:max-w-[460px] aspect-square rounded-full border border-[var(--border)] bg-[var(--surface)] shadow-[var(--shadow)] overflow-hidden flex items-center justify-center select-none"
           >
             {/* Concentric Orbit Rings */}
             <div className="absolute w-[85%] h-[85%] rounded-full border border-[var(--radar-ring)] pointer-events-none" />
@@ -110,21 +110,21 @@ export const TimezoneRadar: React.FC<TimezoneRadarProps> = ({ events, onOpenAddE
 
             {/* Sweep Beam (12s matching video period) */}
             <div
-              className="absolute inset-0 pointer-events-none animate-radar-sweep opacity-75"
+              className="absolute inset-0 rounded-full pointer-events-none animate-radar-sweep opacity-75"
               style={{
                 background: `conic-gradient(from 0deg, var(--radar-sweep) 0deg, transparent 75deg, transparent 360deg)`,
               }}
             />
 
             {/* Center Hub: Live UTC Clock (Bug #1 Fix) */}
-            <div className="relative z-20 w-[112px] h-[112px] rounded-[28px] bg-gradient-to-br from-[#7C3AED] to-[#6366F1] shadow-[0_0_35px_rgba(124,58,237,0.5)] flex flex-col items-center justify-center text-white border border-white/20">
-              <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-purple-200">
+            <div className="relative z-20 w-[92px] h-[92px] sm:w-[112px] sm:h-[112px] rounded-[22px] sm:rounded-[28px] bg-gradient-to-br from-[#7C3AED] to-[#6366F1] shadow-[0_0_35px_rgba(124,58,237,0.5)] flex flex-col items-center justify-center text-white border border-white/20">
+              <span className="text-[9px] sm:text-[10px] font-mono font-bold uppercase tracking-widest text-purple-200">
                 UTC HUB
               </span>
-              <span className="font-mono text-xl font-extrabold tabular-nums tracking-tight text-white mt-0.5">
+              <span className="font-mono text-lg sm:text-xl font-extrabold tabular-nums tracking-tight text-white mt-0.5">
                 {utcTime}
               </span>
-              <span className="text-[9px] text-purple-200/80 font-medium mt-0.5">
+              <span className="text-[8px] sm:text-[9px] text-purple-200/80 font-medium mt-0.5">
                 Master Clock
               </span>
             </div>

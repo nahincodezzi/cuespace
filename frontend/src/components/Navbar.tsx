@@ -197,10 +197,11 @@ export const Navbar: React.FC<NavbarProps> = ({
           {/* Primary CTA: + Add Event */}
           <button
             onClick={onOpenDrawer}
-            className="inline-flex items-center gap-1.5 px-3.5 sm:px-4 py-2 rounded-xl text-xs font-bold text-white bg-gradient-to-r from-[#7C3AED] to-[#6366F1] hover:opacity-95 shadow-[0_4px_20px_rgba(124,58,237,0.35)] active:scale-95 transition-all select-none group shrink-0 cursor-pointer"
+            className="inline-flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-4 py-2 rounded-xl text-xs font-bold text-white bg-gradient-to-r from-[#7C3AED] to-[#6366F1] hover:opacity-95 shadow-[0_4px_20px_rgba(124,58,237,0.35)] active:scale-95 transition-all select-none group shrink-0 cursor-pointer"
           >
-            <Plus className="w-4 h-4 transition-transform group-hover:rotate-90" />
-            <span>Add Event</span>
+            <Plus className="w-4 h-4 transition-transform group-hover:rotate-90 shrink-0" />
+            <span className="hidden xs:inline">Add </span>
+            <span>Event</span>
             <kbd className="hidden sm:inline-flex text-[9px] font-mono font-medium px-1.5 py-0.5 rounded bg-white/20 text-white/90">
               C
             </kbd>
@@ -209,7 +210,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           {/* Mobile Menu Hamburger Toggle */}
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="md:hidden p-2 rounded-xl border border-[var(--border)] bg-[var(--surface)] text-[var(--muted)] hover:text-[var(--fg)]"
+            className="md:hidden w-10 h-10 flex items-center justify-center rounded-xl border border-[var(--border)] bg-[var(--surface)] text-[var(--muted)] hover:text-[var(--fg)] shrink-0 cursor-pointer"
             aria-label="Toggle navigation menu"
           >
             {isMobileMenuOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
