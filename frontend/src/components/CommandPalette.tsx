@@ -212,7 +212,8 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
               setQuery(e.target.value);
               setSelectedIndex(0);
             }}
-            className={`w-full py-4 bg-transparent text-sm focus:outline-none ${inputClass}`}
+            className={`w-full py-4 bg-transparent text-sm border-0 border-none outline-none focus:outline-none focus-visible:outline-none focus:ring-0 focus-visible:ring-0 ring-0 shadow-none ${inputClass}`}
+            style={{ outline: 'none', boxShadow: 'none' }}
           />
           <kbd className={`hidden sm:inline-flex text-[10px] font-mono px-1.5 py-0.5 rounded border ${kbdClass}`}>
             ESC

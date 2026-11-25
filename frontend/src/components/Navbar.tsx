@@ -161,7 +161,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               readOnly
               placeholder="Search or Cmd+K..."
               value={searchQuery}
-              className="w-44 hover:w-52 rounded-xl pl-8 pr-9 py-2 text-xs transition-all duration-200 cursor-pointer focus:outline-none border border-[var(--border)] bg-[var(--surface)] hover:bg-[var(--surface-strong)] text-[var(--fg)] placeholder-[var(--muted-2)]"
+              className="w-44 hover:w-52 rounded-xl pl-8 pr-9 py-2 text-xs transition-all duration-200 cursor-pointer outline-none focus:outline-none focus-visible:outline-none focus:ring-0 ring-0 border border-[var(--border)] bg-[var(--surface)] hover:bg-[var(--surface-strong)] text-[var(--fg)] placeholder-[var(--muted-2)]"
             />
             <div className="absolute right-2.5 top-1/2 -translate-y-1/2 flex items-center gap-0.5 text-[9px] font-mono px-1 py-0.5 rounded border border-[var(--border)] bg-[var(--surface-strong)] text-[var(--muted)] pointer-events-none">
               <Command className="w-2.5 h-2.5" />
@@ -230,7 +230,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               placeholder="Search events..."
               value={searchQuery}
               onChange={(e) => onSearchChange(e.target.value)}
-              className="w-full rounded-xl pl-8 pr-4 py-2 text-xs focus:outline-none border border-[var(--border)] bg-[var(--surface)] text-[var(--fg)] placeholder-[var(--muted)]"
+              className="w-full rounded-xl pl-8 pr-4 py-2 text-xs outline-none focus:outline-none focus-visible:outline-none focus:ring-0 ring-0 border border-[var(--border)] bg-[var(--surface)] text-[var(--fg)] placeholder-[var(--muted)]"
             />
           </div>
 
