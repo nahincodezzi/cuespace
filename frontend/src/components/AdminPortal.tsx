@@ -1013,8 +1013,12 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
             <div className="flex items-center gap-2 shrink-0">
               <span className={`text-xs px-3 py-1 rounded-full font-mono font-medium border ${
                 smtpStatus?.is_configured
-                  ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
-                  : 'bg-amber-500/10 text-amber-400 border-amber-500/20'
+                  ? isDarkMode 
+                    ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' 
+                    : 'bg-emerald-100 text-emerald-900 border-emerald-300 font-semibold'
+                  : isDarkMode 
+                    ? 'bg-amber-500/10 text-amber-400 border-amber-500/20' 
+                    : 'bg-amber-100 text-amber-900 border-amber-300 font-semibold'
               }`}>
                 {smtpStatus?.is_configured ? '● Live Dispatch' : '○ Sandbox'}
               </span>
@@ -1076,17 +1080,27 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                 </form>
 
                 {testEmailResult && (
-                  <div className={`mt-4 p-3.5 rounded-xl border text-xs leading-relaxed ${
+                  <div className={`mt-4 p-4 rounded-xl border text-xs leading-relaxed shadow-xs ${
                     testEmailResult.success
-                      ? 'bg-emerald-500/10 border-emerald-500/25 text-emerald-300'
-                      : 'bg-rose-500/10 border-rose-500/25 text-rose-300'
+                      ? isDarkMode 
+                        ? 'bg-emerald-500/10 border-emerald-500/25 text-emerald-300'
+                        : 'bg-emerald-50 border-emerald-300 text-emerald-950'
+                      : isDarkMode 
+                        ? 'bg-rose-500/10 border-rose-500/25 text-rose-300'
+                        : 'bg-rose-50 border-rose-300 text-rose-950'
                   }`}>
-                    <p className="font-semibold mb-0.5">
+                    <p className={`font-bold mb-1 text-sm ${
+                      testEmailResult.success 
+                        ? isDarkMode ? 'text-emerald-300' : 'text-emerald-800' 
+                        : isDarkMode ? 'text-rose-300' : 'text-rose-800'
+                    }`}>
                       {testEmailResult.success ? '✅ Success!' : '⚠️ Dispatch Result:'}
                     </p>
-                    <p>{testEmailResult.message}</p>
+                    <p className={`font-medium ${isDarkMode ? 'text-emerald-200/90' : 'text-emerald-950'}`}>
+                      {testEmailResult.message}
+                    </p>
                     {testEmailResult.success && (
-                      <p className="mt-1 text-[11px] opacity-80">
+                      <p className={`mt-1.5 text-[11px] font-medium ${isDarkMode ? 'text-emerald-400/80' : 'text-emerald-800'}`}>
                         Check your Inbox (or Spam/Promotions tab) for "CueSpace Live Test".
                       </p>
                     )}
@@ -1218,8 +1232,12 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
               <div className="flex items-center gap-2 shrink-0">
                 <span className={`text-xs px-3 py-1 rounded-full font-mono font-medium border ${
                   twilioStatus?.is_configured
-                    ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
-                    : 'bg-amber-500/10 text-amber-400 border-amber-500/20'
+                    ? isDarkMode 
+                      ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' 
+                      : 'bg-emerald-100 text-emerald-900 border-emerald-300 font-semibold'
+                    : isDarkMode 
+                      ? 'bg-amber-500/10 text-amber-400 border-amber-500/20' 
+                      : 'bg-amber-100 text-amber-900 border-amber-300 font-semibold'
                 }`}>
                   {twilioStatus?.is_configured ? '● Live WhatsApp' : '○ 1-Click wa.me'}
                 </span>
@@ -1281,23 +1299,33 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                   </form>
 
                   {testWaResult && (
-                    <div className={`mt-4 p-3.5 rounded-xl border text-xs leading-relaxed ${
+                    <div className={`mt-4 p-4 rounded-xl border text-xs leading-relaxed shadow-xs ${
                       testWaResult.success
-                        ? 'bg-emerald-500/10 border-emerald-500/25 text-emerald-300'
-                        : 'bg-rose-500/10 border-rose-500/25 text-rose-300'
+                        ? isDarkMode 
+                          ? 'bg-emerald-500/10 border-emerald-500/25 text-emerald-300' 
+                          : 'bg-emerald-50 border-emerald-300 text-emerald-950'
+                        : isDarkMode 
+                          ? 'bg-rose-500/10 border-rose-500/25 text-rose-300' 
+                          : 'bg-rose-50 border-rose-300 text-rose-950'
                     }`}>
-                      <p className="font-semibold mb-0.5">
+                      <p className={`font-bold mb-1 text-sm ${
+                        testWaResult.success 
+                          ? isDarkMode ? 'text-emerald-300' : 'text-emerald-800' 
+                          : isDarkMode ? 'text-rose-300' : 'text-rose-800'
+                      }`}>
                         {testWaResult.success ? '✅ Success!' : '⚠️ Dispatch Result:'}
                       </p>
-                      <p>{testWaResult.message}</p>
+                      <p className={`font-medium ${isDarkMode ? 'text-emerald-200/90' : 'text-emerald-950'}`}>
+                        {testWaResult.message}
+                      </p>
                     </div>
                   )}
 
                   {/* Free 1-Click WhatsApp Wish Link info */}
                   <div className={`mt-4 p-3.5 rounded-xl border text-[11px] leading-relaxed ${
-                    isDarkMode ? 'bg-black/30 border-white/[0.06] text-zinc-400' : 'bg-white border-zinc-200 text-zinc-600'
+                    isDarkMode ? 'bg-black/30 border-white/[0.06] text-zinc-400' : 'bg-white border-zinc-200 text-zinc-700'
                   }`}>
-                    <p className="font-semibold text-emerald-400 mb-1">🎁 Free WhatsApp 1-Click Integration:</p>
+                    <p className={`font-semibold mb-1 ${isDarkMode ? 'text-emerald-400' : 'text-emerald-800 font-bold'}`}>🎁 Free WhatsApp 1-Click Integration:</p>
                     <p>
                       Even without Twilio, every reminder email and live alarm modal includes an instant <strong>"Send WhatsApp Wish"</strong> button. Clicking it opens WhatsApp Web/App with a personalized, pre-written greeting for zero cost!
                     </p>
@@ -1395,9 +1423,9 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
 
                 {/* Guide Note */}
                 <div className={`mt-4 p-3 rounded-xl border text-[11px] leading-relaxed ${
-                  isDarkMode ? 'bg-black/30 border-white/[0.06] text-zinc-400' : 'bg-white border-zinc-200 text-zinc-600'
+                  isDarkMode ? 'bg-black/30 border-white/[0.06] text-zinc-400' : 'bg-white border-zinc-200 text-zinc-700'
                 }`}>
-                  <p className="font-semibold text-emerald-400 mb-1">💡 How to use Twilio WhatsApp Sandbox:</p>
+                  <p className={`font-semibold mb-1 ${isDarkMode ? 'text-emerald-400' : 'text-emerald-800 font-bold'}`}>💡 How to use Twilio WhatsApp Sandbox:</p>
                   <ol className="list-decimal list-inside space-y-0.5">
                     <li>Sign up for a free Twilio account at <a href="https://twilio.com" target="_blank" rel="noreferrer" className="text-emerald-400 underline">twilio.com</a>.</li>
                     <li>Copy Account SID and Auth Token from your Twilio Console dashboard.</li>
