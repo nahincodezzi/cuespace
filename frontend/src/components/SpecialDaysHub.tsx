@@ -211,40 +211,44 @@ export const SpecialDaysHub: React.FC<SpecialDaysHubProps> = ({
       {/* 2. STATS OVERVIEW CARDS                                  */}
       {/* ======================================================== */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
-        <div className={`p-4 rounded-2xl border transition-all ${cardBg}`}>
+        <div className={`card-lift p-4.5 rounded-2xl border backdrop-blur-xl transition-all ${cardBg}`}>
           <div className="flex items-center justify-between mb-2">
             <span className={`text-xs ${textMuted}`}>Total Observances</span>
-            <Calendar className="w-4 h-4 text-indigo-400" />
+            <div className="w-8 h-8 rounded-xl bg-indigo-500/10 flex items-center justify-center text-indigo-400">
+              <Calendar className="w-4 h-4" />
+            </div>
           </div>
-          <div className={`text-2xl font-bold tabular-nums ${textPrimary}`}>{totalCount}</div>
-          <div className={`text-[11px] ${textMuted}`}>Annual special days</div>
+          <div className={`text-2xl font-extrabold tabular-nums tracking-tight ${textPrimary}`}>{totalCount}</div>
+          <div className={`text-[11px] font-medium ${textMuted}`}>Annual special days</div>
         </div>
 
-        <div className={`p-4 rounded-2xl border transition-all ${cardBg}`}>
+        <div className={`card-lift p-4.5 rounded-2xl border backdrop-blur-xl transition-all ${cardBg}`}>
           <div className="flex items-center justify-between mb-2">
             <span className={`text-xs ${textMuted}`}>Active Subscriptions</span>
-            <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+            <div className="w-8 h-8 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-400">
+              <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
+            </div>
           </div>
-          <div className="text-2xl font-bold text-emerald-400 tabular-nums">{subscribedCount}</div>
-          <div className={`text-[11px] ${textMuted}`}>Alerts active for you</div>
+          <div className="text-2xl font-extrabold text-emerald-400 tabular-nums tracking-tight">{subscribedCount}</div>
+          <div className={`text-[11px] font-medium ${textMuted}`}>Alerts active for you</div>
         </div>
 
-        <div className={`p-4 rounded-2xl border transition-all ${cardBg}`}>
+        <div className={`card-lift p-4.5 rounded-2xl border backdrop-blur-xl transition-all ${cardBg}`}>
           <div className="flex items-center justify-between mb-2">
             <span className={`text-xs ${textMuted}`}>Bangladesh Days</span>
-            <span className="text-base">🇧🇩</span>
+            <span className="text-lg">🇧🇩</span>
           </div>
-          <div className={`text-2xl font-bold tabular-nums ${textPrimary}`}>{bdCount}</div>
-          <div className={`text-[11px] ${textMuted}`}>National & cultural events</div>
+          <div className={`text-2xl font-extrabold tabular-nums tracking-tight ${textPrimary}`}>{bdCount}</div>
+          <div className={`text-[11px] font-medium ${textMuted}`}>National & cultural events</div>
         </div>
 
-        <div className={`p-4 rounded-2xl border transition-all ${cardBg}`}>
+        <div className={`card-lift p-4.5 rounded-2xl border backdrop-blur-xl transition-all ${cardBg}`}>
           <div className="flex items-center justify-between mb-2">
             <span className={`text-xs ${textMuted}`}>Worldwide & Family</span>
-            <span className="text-base">🌍</span>
+            <span className="text-lg">🌍</span>
           </div>
-          <div className={`text-2xl font-bold tabular-nums ${textPrimary}`}>{globalCount}</div>
-          <div className={`text-[11px] ${textMuted}`}>International celebrations</div>
+          <div className={`text-2xl font-extrabold tabular-nums tracking-tight ${textPrimary}`}>{globalCount}</div>
+          <div className={`text-[11px] font-medium ${textMuted}`}>International celebrations</div>
         </div>
       </div>
 
@@ -360,7 +364,7 @@ export const SpecialDaysHub: React.FC<SpecialDaysHubProps> = ({
             return (
               <div
                 key={day.id}
-                className={`border rounded-2xl p-5 flex flex-col justify-between transition-all duration-200 hover:scale-[1.01] ${cardBg} ${
+                className={`card-lift border rounded-2xl p-5 flex flex-col justify-between backdrop-blur-xl ${cardBg} ${
                   isSub ? (isDarkMode ? 'ring-1 ring-emerald-500/30' : 'ring-1 ring-emerald-500/40') : ''
                 }`}
               >

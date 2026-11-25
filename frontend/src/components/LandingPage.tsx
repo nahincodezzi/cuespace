@@ -72,18 +72,18 @@ export const LandingPage: React.FC<LandingPageProps> = ({
         <div className="flex flex-col sm:flex-row items-center justify-center gap-3.5 mb-16">
           <button
             onClick={onOpenAddEvent}
-            className="w-full sm:w-auto px-6 py-3 rounded-xl text-sm font-semibold text-white bg-gradient-to-r from-violet-600 via-indigo-600 to-purple-600 hover:from-violet-500 hover:to-purple-500 shadow-xl shadow-indigo-600/25 transition-all active:scale-95 flex items-center justify-center gap-2"
+            className="btn-press w-full sm:w-auto px-6 py-3.5 rounded-xl text-sm font-bold text-white bg-gradient-to-r from-violet-600 via-indigo-600 to-purple-600 hover:from-violet-500 hover:to-purple-500 shadow-xl shadow-indigo-600/30 transition-all flex items-center justify-center gap-2 group"
           >
             <span>{content.ctaPrimaryText}</span>
-            <ArrowRight className="w-4 h-4" />
+            <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
           </button>
           
           <button
             onClick={onOpenDashboard}
-            className={`w-full sm:w-auto px-6 py-3 rounded-xl text-sm font-semibold transition-all flex items-center justify-center gap-2 ${
+            className={`btn-press w-full sm:w-auto px-6 py-3.5 rounded-xl text-sm font-semibold transition-all flex items-center justify-center gap-2 ${
               isDarkMode
-                ? 'text-zinc-300 hover:text-white bg-white/[0.03] hover:bg-white/[0.07] border border-white/10'
-                : 'text-zinc-800 hover:text-zinc-950 bg-white hover:bg-zinc-50 border border-zinc-300 shadow-xs'
+                ? 'text-zinc-200 hover:text-white bg-white/[0.04] hover:bg-white/[0.08] border border-white/10 shadow-sm'
+                : 'text-zinc-800 hover:text-zinc-950 bg-white hover:bg-zinc-50 border border-zinc-300 shadow-sm'
             }`}
           >
             <Compass className={`w-4 h-4 ${isDarkMode ? 'text-indigo-400' : 'text-indigo-600'}`} />
@@ -92,9 +92,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({
 
           <button
             onClick={onOpenAdmin}
-            className={`w-full sm:w-auto px-4 py-3 rounded-xl text-xs font-semibold transition-all flex items-center justify-center gap-1.5 ${
+            className={`btn-press w-full sm:w-auto px-4 py-3.5 rounded-xl text-xs font-semibold transition-all flex items-center justify-center gap-1.5 ${
               isDarkMode
-                ? 'text-zinc-400 hover:text-zinc-200 bg-transparent hover:bg-white/[0.03] border border-transparent hover:border-white/10'
+                ? 'text-zinc-400 hover:text-zinc-200 bg-transparent hover:bg-white/[0.04] border border-transparent hover:border-white/10'
                 : 'text-zinc-700 hover:text-zinc-900 bg-zinc-100 hover:bg-zinc-200/80 border border-zinc-200'
             }`}
           >
@@ -139,14 +139,14 @@ export const LandingPage: React.FC<LandingPageProps> = ({
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             {content.features.map((feat) => (
               <div
                 key={feat.id}
-                className={`group relative rounded-2xl p-6 border transition-all duration-300 flex flex-col justify-between ${
+                className={`card-lift group relative rounded-2xl p-6 border flex flex-col justify-between backdrop-blur-xl ${
                   isDarkMode
-                    ? 'bg-white/[0.02] hover:bg-white/[0.04] border-white/[0.07] hover:border-white/[0.14]'
-                    : 'bg-white hover:bg-zinc-50/80 border-zinc-200/90 hover:border-zinc-300 shadow-xs'
+                    ? 'bg-[#0f1118]/80 hover:bg-[#141722] border-white/[0.08] hover:border-indigo-500/30 shadow-[0_4px_25px_rgba(0,0,0,0.3)] hover:shadow-[0_8px_35px_rgba(99,102,241,0.12)]'
+                    : 'bg-white hover:bg-zinc-50/90 border-zinc-200/90 hover:border-indigo-300 shadow-sm hover:shadow-md'
                 }`}
               >
                 <div>
