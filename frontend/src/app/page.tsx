@@ -227,6 +227,7 @@ export default function DashboardPage() {
               showToast={showToast}
               landingContent={landingContent}
               onUpdateLandingContent={setLandingContent}
+              onExit={() => setCurrentView('landing')}
             />
           </div>
         )}

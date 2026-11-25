@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { 
   Plus, Edit2, Trash2, Send, Clock, Shield, Database, 
   Search, CheckCircle2, AlertTriangle, ArrowUpDown, RefreshCw, X, Lock, LogOut, LayoutTemplate, Sparkles, Check, MessageCircle,
-  Eye, ExternalLink, Mail
+  Eye, EyeOff, User, ArrowLeft, ExternalLink, Mail
 } from 'lucide-react';
 import { SmartEvent, EventCreateInput } from '@/types/event';
 import { LandingContent, FeatureItem } from '@/types/cms';
@@ -22,6 +22,7 @@ interface AdminPortalProps {
   showToast: (msg: string) => void;
   landingContent: LandingContent;
   onUpdateLandingContent: (newContent: LandingContent) => void;
+  onExit?: () => void;
 }
 
 export const AdminPortal: React.FC<AdminPortalProps> = ({
@@ -32,12 +33,24 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
   showToast,
   landingContent,
   onUpdateLandingContent,
+  onExit,
 }) => {
   // Authentication State
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(true); // default logged in for convenience, with logout/login toggle
-  const [loginEmail, setLoginEmail] = useState('admin@cuespace.app');
-  const [loginPassword, setLoginPassword] = useState('admin123');
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+  const [loginEmail, setLoginEmail] = useState('');
+  const [loginPassword, setLoginPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [loginError, setLoginError] = useState('');
+
+  // Restore authenticated session
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const stored = sessionStorage.getItem('cuespace_admin_auth');
+      if (stored === 'true') {
+        setIsAuthenticated(true);
+      }
+    }
+  }, []);
 
   // Admin Navigation Tabs: 'landing_cms' | 'events' | 'logs' | 'smtp'
   const [activeTab, setActiveTab] = useState<'landing_cms' | 'events' | 'logs' | 'smtp'>('landing_cms');
@@ -159,13 +172,29 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    if (loginEmail === 'admin@cuespace.app' && loginPassword === 'admin123') {
+    const user = loginEmail.trim().toLowerCase();
+    const pass = loginPassword.trim();
+
+    if ((user === 'admin' || user === 'admin@cuespace.app') && (pass === 'admin123' || pass === 'cuespace2026')) {
       setIsAuthenticated(true);
+      if (typeof window !== 'undefined') {
+        sessionStorage.setItem('cuespace_admin_auth', 'true');
+      }
       setLoginError('');
-      showToast('Logged in to Admin CMS successfully!');
+      showToast('Authenticated as Administrator successfully!');
     } else {
-      setLoginError('Invalid admin credentials. Use admin@cuespace.app / admin123');
+      setLoginError('Invalid username or password. Please verify and try again.');
     }
+  };
+
+  const handleLogout = () => {
+    setIsAuthenticated(false);
+    setLoginPassword('');
+    if (typeof window !== 'undefined') {
+      sessionStorage.removeItem('cuespace_admin_auth');
+    }
+    showToast('Logged out from Admin CMS.');
+    if (onExit) onExit();
   };
 
   // Save Landing Page CMS text
@@ -271,58 +300,99 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
   const textMuted = isDarkMode ? 'text-zinc-400' : 'text-zinc-500';
   const inputBg = isDarkMode ? 'bg-white/[0.04] border-white/[0.08] text-zinc-100' : 'bg-zinc-50 border-zinc-200 text-zinc-900';
 
-  // LOGIN SCREEN
+  // LOGIN SCREEN (GATED AUTHENTICATION)
   if (!isAuthenticated) {
     return (
-      <div className={`border rounded-3xl p-8 max-w-md mx-auto my-12 ${containerBg}`}>
-        <div className="flex items-center gap-3 mb-6">
-          <div className="w-10 h-10 rounded-2xl bg-indigo-500/10 flex items-center justify-center text-indigo-400">
+      <div className={`border rounded-3xl p-6 sm:p-8 max-w-md mx-auto my-10 sm:my-16 shadow-2xl backdrop-blur-2xl animate-in zoom-in-95 duration-200 ${containerBg}`}>
+        <div className="flex items-center gap-3.5 mb-6 pb-5 border-b border-[var(--border)]">
+          <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-[#7C3AED] to-[#6366F1] flex items-center justify-center text-white shadow-[0_0_20px_rgba(124,58,237,0.4)]">
             <Lock className="w-5 h-5" />
           </div>
           <div>
-            <h2 className={`text-base font-bold ${textPrimary}`}>Admin Portal Login</h2>
-            <p className={`text-xs ${textMuted}`}>Enter credentials to manage CMS & database</p>
+            <h2 className={`text-base sm:text-lg font-bold tracking-tight ${textPrimary}`}>
+              CMS Portal & Admin Login
+            </h2>
+            <p className={`text-xs ${textMuted} mt-0.5`}>
+              Restricted Area · Enter administrator credentials
+            </p>
           </div>
         </div>
 
         {loginError && (
-          <div className="p-3 mb-4 rounded-xl bg-rose-500/10 border border-rose-500/20 text-xs text-rose-400">
-            {loginError}
+          <div className="p-3 mb-5 rounded-xl bg-rose-500/10 border border-rose-500/25 text-xs text-rose-500 flex items-center gap-2 animate-in fade-in duration-150">
+            <AlertTriangle className="w-4 h-4 shrink-0 text-rose-500" />
+            <span className="font-medium">{loginError}</span>
           </div>
         )}
 
         <form onSubmit={handleLogin} className="space-y-4">
           <div>
-            <label className={`block text-xs font-medium mb-1.5 ${textMuted}`}>Email</label>
-            <input
-              type="email"
-              required
-              value={loginEmail}
-              onChange={(e) => setLoginEmail(e.target.value)}
-              className={`w-full rounded-xl px-3.5 py-2.5 text-xs border ${inputBg}`}
-            />
+            <label className={`block text-xs font-semibold mb-1.5 ${isDarkMode ? 'text-zinc-300' : 'text-zinc-700'}`}>
+              Username or Admin Email *
+            </label>
+            <div className="relative">
+              <User className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400" />
+              <input
+                type="text"
+                required
+                autoFocus
+                placeholder="e.g. admin or admin@cuespace.app"
+                value={loginEmail}
+                onChange={(e) => setLoginEmail(e.target.value)}
+                className={`w-full rounded-xl pl-9 pr-3.5 py-2.5 text-xs border focus:outline-none focus:ring-1 focus:ring-indigo-500 transition-colors ${inputBg}`}
+              />
+            </div>
           </div>
+
           <div>
-            <label className={`block text-xs font-medium mb-1.5 ${textMuted}`}>Password</label>
-            <input
-              type="password"
-              required
-              value={loginPassword}
-              onChange={(e) => setLoginPassword(e.target.value)}
-              className={`w-full rounded-xl px-3.5 py-2.5 text-xs border ${inputBg}`}
-            />
+            <label className={`block text-xs font-semibold mb-1.5 ${isDarkMode ? 'text-zinc-300' : 'text-zinc-700'}`}>
+              Password *
+            </label>
+            <div className="relative">
+              <Lock className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400" />
+              <input
+                type={showPassword ? 'text' : 'password'}
+                required
+                placeholder="Enter admin password..."
+                value={loginPassword}
+                onChange={(e) => setLoginPassword(e.target.value)}
+                className={`w-full rounded-xl pl-9 pr-10 py-2.5 text-xs border focus:outline-none focus:ring-1 focus:ring-indigo-500 transition-colors ${inputBg}`}
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 transition-colors cursor-pointer"
+                aria-label="Toggle password visibility"
+              >
+                {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+              </button>
+            </div>
           </div>
 
-          <div className={`p-2.5 rounded-lg text-[11px] ${textMuted} bg-white/[0.02] border border-white/[0.05]`}>
-            Demo credentials: <strong className="text-indigo-400">admin@cuespace.app</strong> / <strong className="text-indigo-400">admin123</strong>
-          </div>
+          <div className="pt-2 flex flex-col gap-2.5">
+            <button
+              type="submit"
+              className="w-full py-2.5 px-4 rounded-xl text-xs font-bold text-white bg-gradient-to-r from-[#7C3AED] to-[#6366F1] hover:shadow-[0_4px_20px_rgba(124,58,237,0.35)] transition-all cursor-pointer flex items-center justify-center gap-2"
+            >
+              <Shield className="w-3.5 h-3.5" />
+              <span>Authenticate & Enter Console</span>
+            </button>
 
-          <button
-            type="submit"
-            className="w-full py-2.5 rounded-xl text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-500 transition-all shadow-md shadow-indigo-600/30"
-          >
-            Authenticate & Access CMS
-          </button>
+            {onExit && (
+              <button
+                type="button"
+                onClick={onExit}
+                className={`w-full py-2 px-4 rounded-xl text-xs font-semibold border transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
+                  isDarkMode 
+                    ? 'border-white/10 text-zinc-400 hover:text-white hover:bg-white/5' 
+                    : 'border-zinc-200 text-zinc-600 hover:text-zinc-950 hover:bg-zinc-50'
+                }`}
+              >
+                <ArrowLeft className="w-3.5 h-3.5" />
+                <span>Cancel & Return to App</span>
+              </button>
+            )}
+          </div>
         </form>
       </div>
     );
@@ -400,8 +470,8 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
           </div>
 
           <button
-            onClick={() => setIsAuthenticated(false)}
-            className={`p-2 rounded-xl border text-xs text-zinc-400 hover:text-rose-400 transition-all ${
+            onClick={handleLogout}
+            className={`p-2 rounded-xl border text-xs text-zinc-400 hover:text-rose-400 transition-all cursor-pointer ${
               isDarkMode ? 'border-white/[0.08] hover:bg-white/[0.05]' : 'border-zinc-200 hover:bg-zinc-100'
             }`}
             title="Sign Out Admin"

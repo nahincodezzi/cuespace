@@ -79,6 +79,7 @@ export default function AdminPage() {
             setLandingContent(newContent);
             saveLandingContent(newContent);
           }}
+          onExit={() => window.location.href = '/'}
         />
       </main>
     </div>
