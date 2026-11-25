@@ -36,7 +36,7 @@ RAW_SPECIAL_DAYS: List[Dict[str, Any]] = [
     {
         "id": "bd-children-day",
         "title": "National Children's Day (BD)",
-        "title_bn": "জাতীয় শিশু দিবস ও বঙ্গবন্ধুর জন্মদিন",
+        "title_bn": "জাতীয় শিশু দিবস",
         "category": "bangladesh",
         "rule": "fixed",
         "month": 3,

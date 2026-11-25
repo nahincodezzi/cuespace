@@ -185,12 +185,14 @@ export const SpecialDaysHub: React.FC<SpecialDaysHubProps> = ({
           <p className={`text-sm mt-2 max-w-3xl leading-relaxed ${textMuted}`}>
             Track Bangladesh national holidays (Mother Language Day, Independence Day, Pohela Boishakh, Victory Day) 
             and worldwide observances (Men's Day, Women's Day, Mother's Day, Father's Day) with automated 
-            <strong className="text-indigo-400 font-semibold"> 1-2 day advance reminders</strong> dispatched straight to your Email & WhatsApp.
+            <strong className={`font-semibold ${isDarkMode ? 'text-indigo-400' : 'text-indigo-700'}`}> 1-2 day advance reminders</strong> dispatched straight to your Email & WhatsApp.
           </p>
         </div>
 
         {/* Year Selector Pill */}
-        <div className="flex items-center gap-2 self-start sm:self-center bg-white/[0.04] p-1 rounded-xl border border-white/10 shrink-0">
+        <div className={`flex items-center gap-2 self-start sm:self-center p-1 rounded-xl border shrink-0 ${
+          isDarkMode ? 'bg-white/[0.04] border-white/10' : 'bg-zinc-100 border-zinc-200'
+        }`}>
           {[2026, 2027].map((yr) => (
             <button
               key={yr}
@@ -373,24 +375,36 @@ export const SpecialDaysHub: React.FC<SpecialDaysHubProps> = ({
                   <div className="flex items-center justify-between gap-2 mb-3">
                     <div className="flex items-center gap-2">
                       <span className="text-xl">{day.icon}</span>
-                      <span className="text-xs font-mono font-bold text-indigo-400 bg-indigo-500/10 px-2 py-0.5 rounded-md border border-indigo-500/20">
+                      <span className={`text-xs font-mono font-bold px-2 py-0.5 rounded-md border ${
+                        isDarkMode
+                          ? 'text-indigo-400 bg-indigo-500/10 border-indigo-500/20'
+                          : 'text-indigo-700 bg-indigo-50 border-indigo-200'
+                      }`}>
                         {day.formatted_date.slice(0, 6)}
                       </span>
                     </div>
 
                     <div className="flex items-center gap-1.5">
                       {isSub && (
-                        <span className="inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 border border-emerald-500/20">
+                        <span className={`inline-flex items-center gap-1 text-[10px] font-semibold px-2 py-0.5 rounded-full border ${
+                          isDarkMode
+                            ? 'bg-emerald-500/15 text-emerald-400 border-emerald-500/20'
+                            : 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                        }`}>
                           <Check className="w-3 h-3" />
                           <span>Subscribed</span>
                         </span>
                       )}
-                      <span className={`text-[10px] font-mono px-2 py-0.5 rounded-full border ${
+                      <span className={`text-[10px] font-mono px-2 py-0.5 rounded-full border font-medium ${
                         day.status === 'today'
                           ? 'bg-rose-500/15 text-rose-400 border-rose-500/25 animate-pulse'
                           : day.status === 'passed'
-                          ? 'bg-zinc-500/10 text-zinc-500 border-zinc-500/20'
-                          : 'bg-indigo-500/10 text-indigo-400 border-indigo-500/20'
+                          ? isDarkMode
+                            ? 'bg-zinc-500/10 text-zinc-400 border-zinc-500/20'
+                            : 'bg-zinc-100 text-zinc-700 border-zinc-300'
+                          : isDarkMode
+                          ? 'bg-indigo-500/10 text-indigo-400 border-indigo-500/20'
+                          : 'bg-indigo-50 text-indigo-700 border-indigo-200'
                       }`}>
                         {day.days_until === 0 
                           ? '🎉 Today' 
@@ -407,7 +421,9 @@ export const SpecialDaysHub: React.FC<SpecialDaysHubProps> = ({
                   <h3 className={`text-base font-bold leading-snug mb-0.5 ${textPrimary}`}>
                     {day.title}
                   </h3>
-                  <div className="text-xs font-semibold text-purple-400 mb-2 font-bengali">
+                  <div className={`text-xs font-semibold mb-2 font-bengali ${
+                    isDarkMode ? 'text-purple-400' : 'text-purple-700 font-bold'
+                  }`}>
                     {day.title_bn}
                   </div>
 
@@ -416,23 +432,27 @@ export const SpecialDaysHub: React.FC<SpecialDaysHubProps> = ({
                     {day.description}
                   </p>
 
-                  {/* Advance Alert Features */}
-                  <div className={`p-2.5 rounded-xl border mb-4 text-[11px] space-y-1 ${
-                    isDarkMode ? 'bg-white/[0.02] border-white/[0.06]' : 'bg-zinc-50 border-zinc-200'
+                  {/* Advance Alert Features (High Contrast in both Light & Dark modes) */}
+                  <div className={`p-3 rounded-xl border mb-4 text-[11px] space-y-1.5 ${
+                    isDarkMode ? 'bg-white/[0.02] border-white/[0.06]' : 'bg-zinc-50 border-zinc-200 shadow-2xs'
                   }`}>
-                    <div className="flex items-center justify-between text-zinc-400">
-                      <span className="flex items-center gap-1">
-                        <Bell className="w-3 h-3 text-indigo-400" />
+                    <div className="flex items-center justify-between">
+                      <span className={`flex items-center gap-1.5 font-medium ${isDarkMode ? 'text-zinc-400' : 'text-zinc-700'}`}>
+                        <Bell className={`w-3.5 h-3.5 ${isDarkMode ? 'text-indigo-400' : 'text-indigo-600'}`} />
                         <span>Advance Reminder:</span>
                       </span>
-                      <strong className="text-indigo-400">1 & 2 days before</strong>
+                      <strong className={`font-semibold ${isDarkMode ? 'text-indigo-400' : 'text-indigo-700'}`}>
+                        1 & 2 days before
+                      </strong>
                     </div>
-                    <div className="flex items-center justify-between text-zinc-400">
-                      <span className="flex items-center gap-1">
-                        <MessageCircle className="w-3 h-3 text-emerald-400" />
+                    <div className="flex items-center justify-between">
+                      <span className={`flex items-center gap-1.5 font-medium ${isDarkMode ? 'text-zinc-400' : 'text-zinc-700'}`}>
+                        <MessageCircle className={`w-3.5 h-3.5 ${isDarkMode ? 'text-emerald-400' : 'text-emerald-600'}`} />
                         <span>Channels:</span>
                       </span>
-                      <span className="text-zinc-300 font-medium">Email + WhatsApp</span>
+                      <span className={`font-semibold ${isDarkMode ? 'text-zinc-200' : 'text-zinc-900'}`}>
+                        Email + WhatsApp
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -441,7 +461,14 @@ export const SpecialDaysHub: React.FC<SpecialDaysHubProps> = ({
                 <div className="pt-3 border-t border-zinc-500/15 flex items-center justify-between gap-2">
                   <div className="flex items-center gap-1 flex-wrap">
                     {day.tags.slice(0, 2).map((t) => (
-                      <span key={t} className="text-[10px] px-1.5 py-0.5 rounded bg-zinc-500/10 text-zinc-400">
+                      <span
+                        key={t}
+                        className={`text-[10px] font-medium px-2 py-0.5 rounded-md border ${
+                          isDarkMode
+                            ? 'bg-zinc-500/10 text-zinc-300 border-zinc-500/20'
+                            : 'bg-zinc-100 text-zinc-700 border-zinc-200 font-semibold'
+                        }`}
+                      >
                         {t}
                       </span>
                     ))}
@@ -503,16 +530,27 @@ export const SpecialDaysHub: React.FC<SpecialDaysHubProps> = ({
               </div>
               <button 
                 onClick={() => setIsSubModalOpen(false)}
-                className="p-1.5 rounded-lg text-zinc-400 hover:text-white hover:bg-white/5 transition-all"
+                className={`p-1.5 rounded-lg transition-all ${
+                  isDarkMode ? 'text-zinc-400 hover:text-white hover:bg-white/5' : 'text-zinc-500 hover:text-zinc-950 hover:bg-zinc-100'
+                }`}
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
 
             {/* Target Days Tags Strip */}
-            <div className="max-h-24 overflow-y-auto mb-4 flex flex-wrap gap-1.5 p-2 rounded-xl bg-white/[0.02] border border-white/[0.06]">
+            <div className={`max-h-24 overflow-y-auto mb-4 flex flex-wrap gap-1.5 p-2 rounded-xl border ${
+              isDarkMode ? 'bg-white/[0.02] border-white/[0.06]' : 'bg-zinc-50 border-zinc-200'
+            }`}>
               {modalTargetDays.map((d) => (
-                <span key={d.id} className="text-[10px] font-semibold px-2 py-0.5 rounded-md bg-indigo-500/15 text-indigo-300 border border-indigo-500/25 flex items-center gap-1">
+                <span
+                  key={d.id}
+                  className={`text-[10px] font-semibold px-2 py-0.5 rounded-md border flex items-center gap-1 ${
+                    isDarkMode
+                      ? 'bg-indigo-500/15 text-indigo-300 border-indigo-500/25'
+                      : 'bg-indigo-50 text-indigo-800 border-indigo-200'
+                  }`}
+                >
                   <span>{d.icon}</span>
                   <span>{d.title}</span>
                 </span>
@@ -579,8 +617,10 @@ export const SpecialDaysHub: React.FC<SpecialDaysHubProps> = ({
                         }}
                         className={`p-2 rounded-xl text-xs font-semibold border text-center transition-all ${
                           isChecked
-                            ? 'bg-indigo-600/20 border-indigo-500 text-indigo-400 shadow-xs'
-                            : isDarkMode ? 'bg-white/[0.02] border-white/[0.06] text-zinc-400' : 'bg-zinc-50 border-zinc-200 text-zinc-600'
+                            ? isDarkMode
+                              ? 'bg-indigo-600/20 border-indigo-500 text-indigo-400 shadow-xs'
+                              : 'bg-indigo-50 border-indigo-600 text-indigo-700 shadow-xs'
+                            : isDarkMode ? 'bg-white/[0.02] border-white/[0.06] text-zinc-400' : 'bg-zinc-50 border-zinc-200 text-zinc-700'
                         }`}
                       >
                         {isChecked ? '✓ ' : ''}{item.label}
@@ -592,21 +632,25 @@ export const SpecialDaysHub: React.FC<SpecialDaysHubProps> = ({
 
               {/* Channel checkboxes */}
               <div className="flex items-center gap-4 pt-1">
-                <label className="flex items-center gap-2 cursor-pointer text-xs font-semibold">
+                <label className={`flex items-center gap-2 cursor-pointer text-xs font-semibold ${
+                  isDarkMode ? 'text-zinc-200' : 'text-zinc-800'
+                }`}>
                   <input
                     type="checkbox"
                     checked={channelEmail}
                     onChange={(e) => setChannelEmail(e.target.checked)}
-                    className="rounded border-zinc-600 text-indigo-600 focus:ring-indigo-500"
+                    className="rounded border-zinc-400 text-indigo-600 focus:ring-indigo-500"
                   />
                   <span>✉️ Email Delivery</span>
                 </label>
-                <label className="flex items-center gap-2 cursor-pointer text-xs font-semibold">
+                <label className={`flex items-center gap-2 cursor-pointer text-xs font-semibold ${
+                  isDarkMode ? 'text-zinc-200' : 'text-zinc-800'
+                }`}>
                   <input
                     type="checkbox"
                     checked={channelWhatsapp}
                     onChange={(e) => setChannelWhatsapp(e.target.checked)}
-                    className="rounded border-zinc-600 text-indigo-600 focus:ring-indigo-500"
+                    className="rounded border-zinc-400 text-indigo-600 focus:ring-indigo-500"
                   />
                   <span>💬 WhatsApp Delivery</span>
                 </label>
