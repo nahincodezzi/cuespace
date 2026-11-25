@@ -26,7 +26,7 @@ export const DEFAULT_LANDING_CONTENT: LandingContent = {
   heroSubtitle: 'Timezone-aware reminders for birthdays, anniversaries, and critical deadlines. Automated multi-channel dispatch via Email, SMS & WhatsApp with 1-click snooze.',
   ctaPrimaryText: 'Schedule First Event',
   ctaSecondaryText: 'Explore Timezone Radar',
-  footerNotice: 'Designed with Linear, Vercel & CueSpace aesthetics. Powered by FastAPI & Next.js.',
+  footerNotice: '© 2026 CueSpace. All rights reserved.',
   features: [
     {
       id: 'f1',

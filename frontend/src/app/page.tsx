@@ -20,6 +20,7 @@ import { getLandingContent, saveLandingContent } from '@/lib/cmsStorage';
 import { fetchEvents, createEventApi, fetchLiveAlerts, clearLiveAlertsApi } from '@/lib/api';
 import { LiveAlarmModal, LiveAlertItem } from '@/components/LiveAlarmModal';
 import { LayoutGrid, ListFilter, Sparkles, Compass, ShieldAlert, Calendar } from 'lucide-react';
+import { useTheme } from 'next-themes';
 
 export default function DashboardPage() {
   const [events, setEvents] = useState<SmartEvent[]>([]);
@@ -28,7 +29,12 @@ export default function DashboardPage() {
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [viewMode, setViewMode] = useState<'timeline' | 'grid'>('timeline');
   const [currentView, setCurrentView] = useState<'landing' | 'dashboard' | 'admin' | 'orbit' | 'special_days'>('landing');
-  const [isDarkMode, setIsDarkMode] = useState(true);
+  
+  const { resolvedTheme, setTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+  const isDarkMode = !mounted || resolvedTheme === 'dark';
+  const toggleTheme = () => setTheme(isDarkMode ? 'light' : 'dark');
   
   // Landing Page CMS Content State
   const [landingContent, setLandingContent] = useState<LandingContent>(DEFAULT_LANDING_CONTENT);
@@ -155,14 +161,12 @@ export default function DashboardPage() {
   }, [events, searchQuery, selectedCategory]);
 
   return (
-    <div className={`min-h-screen ${
-      isDarkMode ? 'bg-[#08080d] text-zinc-100' : 'bg-[#FAFAFB] text-zinc-900'
-    } antialiased transition-colors duration-200`}>
+    <div className="min-h-screen bg-transparent text-[var(--fg)] antialiased transition-colors duration-500">
       
       {/* Toast Notification */}
       {toastMessage && (
-        <div className="fixed bottom-6 right-6 z-50 bg-[#161922] border border-indigo-500/40 text-indigo-200 px-4 py-3 rounded-2xl shadow-2xl flex items-center gap-2.5 text-xs font-medium animate-in fade-in slide-in-from-bottom-3 duration-200">
-          <Sparkles className="w-4 h-4 text-indigo-400 shrink-0" />
+        <div className="fixed bottom-6 right-6 z-50 bg-[var(--surface-strong)] border border-[var(--border)] text-[var(--fg)] px-4 py-3 rounded-2xl shadow-2xl flex items-center gap-2.5 text-xs font-semibold animate-in fade-in slide-in-from-bottom-3 duration-200">
+          <Sparkles className="w-4 h-4 text-[var(--accent-text)] shrink-0" />
           <span>{toastMessage}</span>
         </div>
       )}
@@ -174,7 +178,7 @@ export default function DashboardPage() {
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
         isDarkMode={isDarkMode}
-        onToggleTheme={() => setIsDarkMode(!isDarkMode)}
+        onToggleTheme={toggleTheme}
         totalEvents={events.length}
         searchInputRef={searchInputRef}
         currentView={currentView}
@@ -384,7 +388,7 @@ export default function DashboardPage() {
         }}
         onOpenCreate={() => setIsDrawerOpen(true)}
         onNavigate={setCurrentView}
-        onToggleTheme={() => setIsDarkMode(!isDarkMode)}
+        onToggleTheme={toggleTheme}
         isDarkMode={isDarkMode}
         onOpenTemplates={() => setIsTemplatesModalOpen(true)}
       />
