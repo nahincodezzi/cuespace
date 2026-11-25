@@ -155,6 +155,8 @@ export const Navbar: React.FC<NavbarProps> = ({
             <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-[var(--muted-2)] group-hover:text-[var(--accent-text)] transition-colors" />
             <input
               ref={searchInputRef}
+              id="header-search-desktop"
+              name="search"
               type="text"
               readOnly
               placeholder="Search or Cmd+K..."
