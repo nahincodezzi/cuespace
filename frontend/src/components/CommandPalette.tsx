@@ -148,18 +148,61 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
     },
   ].filter(a => a.label.toLowerCase().includes(query.toLowerCase()));
 
+  // Dynamic Theme Classes
+  const modalBg = isDarkMode 
+    ? 'bg-[#0f1118]/95 border-white/[0.12] text-white shadow-[0_20px_60px_rgba(0,0,0,0.6)]' 
+    : 'bg-white/95 border-zinc-200/90 text-zinc-900 shadow-[0_20px_50px_rgba(0,0,0,0.15)]';
+
+  const backdropBg = isDarkMode ? 'bg-black/75' : 'bg-black/40';
+
+  const headerBorder = isDarkMode ? 'border-white/[0.08]' : 'border-zinc-200';
+
+  const inputClass = isDarkMode 
+    ? 'text-white placeholder-zinc-500' 
+    : 'text-zinc-900 placeholder-zinc-400';
+
+  const kbdClass = isDarkMode
+    ? 'bg-white/5 text-zinc-400 border-white/10'
+    : 'bg-zinc-100 text-zinc-600 border-zinc-200';
+
+  const sectionLabelClass = isDarkMode ? 'text-zinc-500' : 'text-zinc-500';
+
+  const eventItemClass = isDarkMode
+    ? 'text-zinc-300 hover:text-white hover:bg-white/[0.06]'
+    : 'text-zinc-700 hover:text-zinc-950 hover:bg-zinc-100/80';
+
+  const eventTitleClass = isDarkMode ? 'text-white' : 'text-zinc-900 font-semibold';
+
+  const categoryTagClass = isDarkMode
+    ? 'bg-white/5 text-zinc-400 border-white/10'
+    : 'bg-zinc-100 text-zinc-600 border-zinc-200';
+
+  const dateClass = isDarkMode ? 'text-zinc-500' : 'text-zinc-500 font-mono';
+
+  const actionItemClass = isDarkMode
+    ? 'text-zinc-300 hover:text-white hover:bg-purple-500/10 hover:border-purple-500/20'
+    : 'text-zinc-700 hover:text-purple-900 hover:bg-purple-50/80 hover:border-purple-200';
+
+  const actionIconClass = isDarkMode
+    ? 'text-purple-400 group-hover:text-purple-300'
+    : 'text-purple-600 group-hover:text-purple-700';
+
+  const footerClass = isDarkMode
+    ? 'bg-white/[0.02] border-white/[0.06] text-zinc-500'
+    : 'bg-zinc-50 border-zinc-200 text-zinc-600';
+
   return (
     <div 
-      className="fixed inset-0 z-50 flex items-start justify-center pt-20 px-4 bg-black/70 backdrop-blur-md animate-in fade-in duration-150"
+      className={`fixed inset-0 z-50 flex items-start justify-center pt-20 px-4 ${backdropBg} backdrop-blur-md animate-in fade-in duration-150`}
       onClick={onClose}
     >
       <div 
-        className="w-full max-w-xl rounded-2xl bg-[#0f1118]/95 border border-white/[0.12] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-150"
+        className={`w-full max-w-xl rounded-2xl border backdrop-blur-2xl overflow-hidden animate-in zoom-in-95 duration-150 ${modalBg}`}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Search Header */}
-        <div className="flex items-center px-4 border-b border-white/[0.08]">
-          <Search className="w-4 h-4 text-purple-400 shrink-0 mr-3" />
+        <div className={`flex items-center px-4 border-b ${headerBorder}`}>
+          <Search className={`w-4 h-4 shrink-0 mr-3 ${isDarkMode ? 'text-purple-400' : 'text-purple-600'}`} />
           <input
             ref={inputRef}
             type="text"
@@ -169,9 +212,9 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
               setQuery(e.target.value);
               setSelectedIndex(0);
             }}
-            className="w-full py-4 bg-transparent text-sm text-white placeholder-zinc-500 focus:outline-none"
+            className={`w-full py-4 bg-transparent text-sm focus:outline-none ${inputClass}`}
           />
-          <kbd className="hidden sm:inline-flex text-[10px] font-mono px-1.5 py-0.5 rounded bg-white/5 text-zinc-400 border border-white/10">
+          <kbd className={`hidden sm:inline-flex text-[10px] font-mono px-1.5 py-0.5 rounded border ${kbdClass}`}>
             ESC
           </kbd>
         </div>
@@ -182,7 +225,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
           {/* Section: Events */}
           {matchingEvents.length > 0 && (
             <div>
-              <div className="px-3 py-1.5 text-[11px] font-mono uppercase tracking-wider text-zinc-500 font-semibold">
+              <div className={`px-3 py-1.5 text-[11px] font-mono uppercase tracking-wider font-semibold ${sectionLabelClass}`}>
                 Events ({matchingEvents.length})
               </div>
               <div className="space-y-1">
@@ -193,16 +236,16 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
                       onClose();
                       onSelectEvent(evt);
                     }}
-                    className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-left text-xs text-zinc-300 hover:text-white hover:bg-white/[0.06] transition-all group"
+                    className={`btn-press w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-left text-xs transition-all group ${eventItemClass}`}
                   >
                     <div className="flex items-center gap-2.5 truncate">
-                      <Calendar className="w-3.5 h-3.5 text-purple-400 shrink-0" />
-                      <span className="font-medium text-white truncate">{evt.title}</span>
-                      <span className="text-[10px] px-2 py-0.5 rounded-full bg-white/5 text-zinc-400 border border-white/10">
+                      <Calendar className={`w-3.5 h-3.5 shrink-0 ${isDarkMode ? 'text-purple-400' : 'text-purple-600'}`} />
+                      <span className={`truncate ${eventTitleClass}`}>{evt.title}</span>
+                      <span className={`text-[10px] px-2 py-0.5 rounded-full border ${categoryTagClass}`}>
                         {evt.category}
                       </span>
                     </div>
-                    <span className="text-[11px] text-zinc-500 font-mono shrink-0 ml-2">
+                    <span className={`text-[11px] shrink-0 ml-2 ${dateClass}`}>
                       {evt.original_date}
                     </span>
                   </button>
@@ -214,7 +257,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
           {/* Section: Quick Actions */}
           {actions.length > 0 && (
             <div>
-              <div className="px-3 py-1.5 text-[11px] font-mono uppercase tracking-wider text-zinc-500 font-semibold">
+              <div className={`px-3 py-1.5 text-[11px] font-mono uppercase tracking-wider font-semibold ${sectionLabelClass}`}>
                 Quick Actions
               </div>
               <div className="space-y-1">
@@ -224,13 +267,13 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
                     <button
                       key={act.id}
                       onClick={act.action}
-                      className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-left text-xs text-zinc-300 hover:text-white hover:bg-purple-500/10 hover:border-purple-500/20 border border-transparent transition-all group"
+                      className={`btn-press w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-left text-xs border border-transparent transition-all group ${actionItemClass}`}
                     >
                       <div className="flex items-center gap-2.5">
-                        <Icon className="w-4 h-4 text-purple-400 group-hover:text-purple-300 transition-colors" />
-                        <span className="font-medium">{act.label}</span>
+                        <Icon className={`w-4 h-4 transition-colors ${actionIconClass}`} />
+                        <span className="font-semibold">{act.label}</span>
                       </div>
-                      <kbd className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-white/5 text-zinc-400 border border-white/10">
+                      <kbd className={`text-[10px] font-mono px-1.5 py-0.5 rounded border ${kbdClass}`}>
                         {act.shortcut}
                       </kbd>
                     </button>
@@ -241,7 +284,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
           )}
 
           {matchingEvents.length === 0 && actions.length === 0 && (
-            <div className="py-8 text-center text-xs text-zinc-500">
+            <div className={`py-8 text-center text-xs ${isDarkMode ? 'text-zinc-500' : 'text-zinc-400'}`}>
               No matching commands or events found for &quot;{query}&quot;
             </div>
           )}
@@ -249,12 +292,12 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
         </div>
 
         {/* Footer info bar */}
-        <div className="px-4 py-2 bg-white/[0.02] border-t border-white/[0.06] flex items-center justify-between text-[11px] text-zinc-500">
+        <div className={`px-4 py-2 border-t flex items-center justify-between text-[11px] ${footerClass}`}>
           <div className="flex items-center gap-3">
-            <span>Navigation: <kbd className="font-mono text-zinc-400">↑↓</kbd></span>
-            <span>Select: <kbd className="font-mono text-zinc-400">↵</kbd></span>
+            <span>Navigation: <kbd className={`font-mono font-semibold ${isDarkMode ? 'text-zinc-400' : 'text-zinc-700'}`}>↑↓</kbd></span>
+            <span>Select: <kbd className={`font-mono font-semibold ${isDarkMode ? 'text-zinc-400' : 'text-zinc-700'}`}>↵</kbd></span>
           </div>
-          <span>CueSpace Command Bar</span>
+          <span className="font-medium">CueSpace Command Bar</span>
         </div>
 
       </div>
