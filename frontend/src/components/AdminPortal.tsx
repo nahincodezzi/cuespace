@@ -11,7 +11,8 @@ import { LandingContent, FeatureItem } from '@/types/cms';
 import { saveLandingContent } from '@/lib/cmsStorage';
 import { 
   updateEventApi, deleteEventApi, dispatchNowApi, fetchAuditLogs, AuditLog,
-  fetchSmtpStatus, configureSmtpApi, sendTestEmailApi, SmtpStatus
+  fetchSmtpStatus, configureSmtpApi, sendTestEmailApi, SmtpStatus,
+  fetchTwilioStatus, configureTwilioApi, sendTestWhatsAppApi, TwilioStatus
 } from '@/lib/api';
 
 interface AdminPortalProps {
@@ -79,6 +80,16 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
   const [isSendingTestEmail, setIsSendingTestEmail] = useState(false);
   const [testEmailResult, setTestEmailResult] = useState<{ success: boolean; message: string } | null>(null);
 
+  // Real WhatsApp & Twilio Configuration State
+  const [twilioStatus, setTwilioStatus] = useState<TwilioStatus | null>(null);
+  const [twilioSid, setTwilioSid] = useState('');
+  const [twilioToken, setTwilioToken] = useState('');
+  const [twilioWaNumber, setTwilioWaNumber] = useState('');
+  const [isSavingTwilio, setIsSavingTwilio] = useState(false);
+  const [testWaPhone, setTestWaPhone] = useState('');
+  const [isSendingTestWa, setIsSendingTestWa] = useState(false);
+  const [testWaResult, setTestWaResult] = useState<{ success: boolean; message: string } | null>(null);
+
   // Landing Page CMS Form State
   const [cmsForm, setCmsForm] = useState<LandingContent>(landingContent);
   const [editingFeature, setEditingFeature] = useState<FeatureItem | null>(null);
@@ -97,7 +108,10 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
 
   useEffect(() => {
     if (activeTab === 'logs') loadLogs();
-    if (activeTab === 'smtp') loadSmtp();
+    if (activeTab === 'smtp') {
+      loadSmtp();
+      loadTwilio();
+    }
   }, [activeTab]);
 
   const loadSmtp = async () => {
@@ -157,6 +171,58 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
       showToast(`Failed: ${err.message}`);
     } finally {
       setIsSendingTestEmail(false);
+    }
+  };
+
+  const loadTwilio = async () => {
+    try {
+      const data = await fetchTwilioStatus();
+      setTwilioStatus(data);
+      if (data.twilio_whatsapp_number) setTwilioWaNumber(data.twilio_whatsapp_number);
+    } catch (err) {
+      console.error('Failed to load Twilio status', err);
+    }
+  };
+
+  const handleSaveTwilio = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!twilioSid || !twilioToken || !twilioWaNumber) {
+      showToast('Please enter Twilio Account SID, Auth Token, and WhatsApp Number.');
+      return;
+    }
+    setIsSavingTwilio(true);
+    try {
+      const res = await configureTwilioApi({
+        twilio_account_sid: twilioSid,
+        twilio_auth_token: twilioToken,
+        twilio_whatsapp_number: twilioWaNumber,
+      });
+      showToast(res.message);
+      await loadTwilio();
+    } catch (err: any) {
+      showToast(`Error: ${err.message}`);
+    } finally {
+      setIsSavingTwilio(false);
+    }
+  };
+
+  const handleSendTestWhatsApp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!testWaPhone) {
+      showToast('Please enter a recipient phone number (e.g. +8801700000000).');
+      return;
+    }
+    setIsSendingTestWa(true);
+    setTestWaResult(null);
+    try {
+      const res = await sendTestWhatsAppApi({ recipient_phone: testWaPhone });
+      setTestWaResult({ success: res.success, message: res.message });
+      showToast(res.message);
+    } catch (err: any) {
+      setTestWaResult({ success: false, message: err.message });
+      showToast(`Failed: ${err.message}`);
+    } finally {
+      setIsSendingTestWa(false);
     }
   };
 
@@ -465,7 +531,7 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
               }`}
             >
               <Mail className="w-3.5 h-3.5 text-purple-400" />
-              <span>Real Email & SMTP</span>
+              <span>Real Email & WhatsApp</span>
             </button>
           </div>
 
@@ -1123,6 +1189,222 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                   <li>Type app name "CueSpace" and click Create.</li>
                   <li>Copy the 16-character code generated and paste it above!</li>
                 </ol>
+              </div>
+            </div>
+          </div>
+
+          {/* DIVIDER: WHATSAPP NOTIFICATION INTEGRATION */}
+          <div className="pt-6 border-t border-[var(--border)]">
+            {/* Status Indicator */}
+            <div className={`p-6 rounded-2xl border flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 ${
+              isDarkMode ? 'bg-[#111318] border-white/[0.08]' : 'bg-white border-zinc-200 shadow-xs'
+            }`}>
+              <div>
+                <div className="flex items-center gap-2 mb-1.5">
+                  <span className={`w-2.5 h-2.5 rounded-full ${
+                    twilioStatus?.is_configured ? 'bg-emerald-500 animate-pulse' : 'bg-amber-400'
+                  }`} />
+                  <h3 className={`text-base font-bold ${textPrimary}`}>
+                    {twilioStatus?.is_configured ? 'Real WhatsApp Dispatch Active' : 'WhatsApp 1-Click Wish & Sandbox Mode'}
+                  </h3>
+                </div>
+                <p className={`text-xs ${textMuted}`}>
+                  {twilioStatus?.is_configured 
+                    ? `Automated WhatsApp notifications are dispatched live via Twilio (${twilioStatus.twilio_whatsapp_number}).`
+                    : 'Twilio WhatsApp API is not yet configured. The system provides 1-click wa.me instant wish buttons for free, or you can enter Twilio credentials below for automated bots.'}
+                </p>
+              </div>
+
+              <div className="flex items-center gap-2 shrink-0">
+                <span className={`text-xs px-3 py-1 rounded-full font-mono font-medium border ${
+                  twilioStatus?.is_configured
+                    ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
+                    : 'bg-amber-500/10 text-amber-400 border-amber-500/20'
+                }`}>
+                  {twilioStatus?.is_configured ? '● Live WhatsApp' : '○ 1-Click wa.me'}
+                </span>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              {/* Box 3: Send Test WhatsApp Message */}
+              <div className={`p-6 rounded-2xl border flex flex-col justify-between ${
+                isDarkMode ? 'bg-white/[0.02] border-white/[0.08]' : 'bg-zinc-50 border-zinc-200'
+              }`}>
+                <div>
+                  <div className="flex items-center gap-2 mb-3">
+                    <div className="w-7 h-7 rounded-lg bg-emerald-500/10 flex items-center justify-center text-emerald-400">
+                      <MessageCircle className="w-3.5 h-3.5" />
+                    </div>
+                    <h4 className={`text-sm font-bold ${textPrimary}`}>Test WhatsApp Dispatch</h4>
+                  </div>
+                  <p className={`text-xs ${textMuted} mb-4`}>
+                    Enter your phone number (with country code, e.g. +8801700000000) to verify your WhatsApp setup.
+                  </p>
+
+                  <form onSubmit={handleSendTestWhatsApp} className="space-y-3.5">
+                    <div>
+                      <label htmlFor="admin_test_recipient_phone" className={`block text-xs font-semibold mb-1 ${textPrimary}`}>
+                        Your WhatsApp Phone Number *
+                      </label>
+                      <input
+                        id="admin_test_recipient_phone"
+                        name="test_recipient_phone"
+                        type="text"
+                        required
+                        placeholder="e.g. +8801712345678"
+                        value={testWaPhone}
+                        onChange={(e) => setTestWaPhone(e.target.value)}
+                        className={`w-full px-3.5 py-2.5 rounded-xl text-xs border focus:outline-none focus:ring-1 focus:ring-emerald-500 ${
+                          isDarkMode ? 'bg-white/[0.04] border-white/[0.1] text-white placeholder-zinc-500' : 'bg-white border-zinc-200 text-zinc-900 placeholder-zinc-400'
+                        }`}
+                      />
+                    </div>
+
+                    <button
+                      type="submit"
+                      disabled={isSendingTestWa}
+                      className="w-full py-2.5 rounded-xl text-xs font-semibold text-white bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 shadow-md shadow-emerald-600/25 transition-all flex items-center justify-center gap-2"
+                    >
+                      {isSendingTestWa ? (
+                        <>
+                          <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                          <span>Sending WhatsApp Message...</span>
+                        </>
+                      ) : (
+                        <>
+                          <MessageCircle className="w-3.5 h-3.5" />
+                          <span>Send Test WhatsApp Message</span>
+                        </>
+                      )}
+                    </button>
+                  </form>
+
+                  {testWaResult && (
+                    <div className={`mt-4 p-3.5 rounded-xl border text-xs leading-relaxed ${
+                      testWaResult.success
+                        ? 'bg-emerald-500/10 border-emerald-500/25 text-emerald-300'
+                        : 'bg-rose-500/10 border-rose-500/25 text-rose-300'
+                    }`}>
+                      <p className="font-semibold mb-0.5">
+                        {testWaResult.success ? '✅ Success!' : '⚠️ Dispatch Result:'}
+                      </p>
+                      <p>{testWaResult.message}</p>
+                    </div>
+                  )}
+
+                  {/* Free 1-Click WhatsApp Wish Link info */}
+                  <div className={`mt-4 p-3.5 rounded-xl border text-[11px] leading-relaxed ${
+                    isDarkMode ? 'bg-black/30 border-white/[0.06] text-zinc-400' : 'bg-white border-zinc-200 text-zinc-600'
+                  }`}>
+                    <p className="font-semibold text-emerald-400 mb-1">🎁 Free WhatsApp 1-Click Integration:</p>
+                    <p>
+                      Even without Twilio, every reminder email and live alarm modal includes an instant <strong>"Send WhatsApp Wish"</strong> button. Clicking it opens WhatsApp Web/App with a personalized, pre-written greeting for zero cost!
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Box 4: Twilio WhatsApp Credentials Setup */}
+              <div className={`p-6 rounded-2xl border ${
+                isDarkMode ? 'bg-white/[0.02] border-white/[0.08]' : 'bg-zinc-50 border-zinc-200'
+              }`}>
+                <div className="flex items-center gap-2 mb-3">
+                  <div className="w-7 h-7 rounded-lg bg-teal-500/10 flex items-center justify-center text-teal-400">
+                    <Database className="w-3.5 h-3.5" />
+                  </div>
+                  <h4 className={`text-sm font-bold ${textPrimary}`}>Twilio WhatsApp Credentials</h4>
+                </div>
+                <p className={`text-xs ${textMuted} mb-4`}>
+                  Enter your Twilio API keys to automate WhatsApp messages directly from the server.
+                </p>
+
+                <form onSubmit={handleSaveTwilio} className="space-y-3.5">
+                  <div>
+                    <label htmlFor="admin_twilio_sid" className={`block text-xs font-semibold mb-1 ${textPrimary}`}>
+                      Twilio Account SID *
+                    </label>
+                    <input
+                      id="admin_twilio_sid"
+                      name="twilio_sid"
+                      type="text"
+                      required
+                      placeholder="ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+                      value={twilioSid}
+                      onChange={(e) => setTwilioSid(e.target.value)}
+                      className={`w-full px-3.5 py-2 rounded-xl text-xs font-mono border focus:outline-none focus:ring-1 focus:ring-emerald-500 ${
+                        isDarkMode ? 'bg-white/[0.04] border-white/[0.1] text-white placeholder-zinc-500' : 'bg-white border-zinc-200 text-zinc-900 placeholder-zinc-400'
+                      }`}
+                    />
+                  </div>
+
+                  <div>
+                    <label htmlFor="admin_twilio_token" className={`block text-xs font-semibold mb-1 ${textPrimary}`}>
+                      Twilio Auth Token *
+                    </label>
+                    <input
+                      id="admin_twilio_token"
+                      name="twilio_token"
+                      type="password"
+                      required
+                      placeholder="your_twilio_auth_token"
+                      value={twilioToken}
+                      onChange={(e) => setTwilioToken(e.target.value)}
+                      className={`w-full px-3.5 py-2 rounded-xl text-xs font-mono border focus:outline-none focus:ring-1 focus:ring-emerald-500 ${
+                        isDarkMode ? 'bg-white/[0.04] border-white/[0.1] text-white placeholder-zinc-500' : 'bg-white border-zinc-200 text-zinc-900 placeholder-zinc-400'
+                      }`}
+                    />
+                  </div>
+
+                  <div>
+                    <label htmlFor="admin_twilio_wa_number" className={`block text-xs font-semibold mb-1 ${textPrimary}`}>
+                      Twilio WhatsApp Sender Number *
+                    </label>
+                    <input
+                      id="admin_twilio_wa_number"
+                      name="twilio_wa_number"
+                      type="text"
+                      required
+                      placeholder="e.g. whatsapp:+14155238886"
+                      value={twilioWaNumber}
+                      onChange={(e) => setTwilioWaNumber(e.target.value)}
+                      className={`w-full px-3.5 py-2 rounded-xl text-xs font-mono border focus:outline-none focus:ring-1 focus:ring-emerald-500 ${
+                        isDarkMode ? 'bg-white/[0.04] border-white/[0.1] text-white placeholder-zinc-500' : 'bg-white border-zinc-200 text-zinc-900 placeholder-zinc-400'
+                      }`}
+                    />
+                  </div>
+
+                  <button
+                    type="submit"
+                    disabled={isSavingTwilio}
+                    className="w-full py-2.5 rounded-xl text-xs font-semibold text-white bg-emerald-600 hover:bg-emerald-500 shadow-md shadow-emerald-600/25 transition-all flex items-center justify-center gap-2"
+                  >
+                    {isSavingTwilio ? (
+                      <>
+                        <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                        <span>Saving Credentials...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Check className="w-3.5 h-3.5" />
+                        <span>Save & Activate Twilio WhatsApp</span>
+                      </>
+                    )}
+                  </button>
+                </form>
+
+                {/* Guide Note */}
+                <div className={`mt-4 p-3 rounded-xl border text-[11px] leading-relaxed ${
+                  isDarkMode ? 'bg-black/30 border-white/[0.06] text-zinc-400' : 'bg-white border-zinc-200 text-zinc-600'
+                }`}>
+                  <p className="font-semibold text-emerald-400 mb-1">💡 How to use Twilio WhatsApp Sandbox:</p>
+                  <ol className="list-decimal list-inside space-y-0.5">
+                    <li>Sign up for a free Twilio account at <a href="https://twilio.com" target="_blank" rel="noreferrer" className="text-emerald-400 underline">twilio.com</a>.</li>
+                    <li>Copy Account SID and Auth Token from your Twilio Console dashboard.</li>
+                    <li>Go to Messaging &rarr; Try it out &rarr; Send a WhatsApp message.</li>
+                    <li>Use the Twilio Sandbox WhatsApp number (usually <code>whatsapp:+14155238886</code>).</li>
+                  </ol>
+                </div>
               </div>
             </div>
           </div>

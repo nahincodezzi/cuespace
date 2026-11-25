@@ -15,10 +15,11 @@ from app.models.tag import Tag
 from app.models.user import User
 from app.models.notification_log import NotificationLog
 from app.schemas.event import EventCreate, EventUpdate, EventResponse
-from app.schemas.notification import SmtpConfigRequest, TestEmailRequest
+from app.schemas.notification import SmtpConfigRequest, TestEmailRequest, TwilioConfigRequest, TestWhatsAppRequest
 from app.services.recurrence import RecurrenceEngine
 from app.services.snooze import SnoozeService
 from app.services.email import send_real_email
+from app.services.whatsapp import send_real_whatsapp
 from app.services.scheduler import get_live_alerts, clear_live_alerts
 
 router = APIRouter()
@@ -544,6 +545,83 @@ async def send_test_email(payload: TestEmailRequest):
         "success": success,
         "message": msg,
         "recipient": payload.recipient_email
+    }
+
+
+@router.get("/twilio/status", summary="Check Real WhatsApp & Twilio Configuration Status")
+async def get_twilio_status():
+    is_conf = bool(
+        settings.TWILIO_ACCOUNT_SID 
+        and not settings.TWILIO_ACCOUNT_SID.startswith("ACXXXX")
+        and settings.TWILIO_AUTH_TOKEN
+        and settings.TWILIO_WHATSAPP_NUMBER
+    )
+    return {
+        "is_configured": is_conf,
+        "twilio_account_sid": settings.TWILIO_ACCOUNT_SID[:8] + "..." if settings.TWILIO_ACCOUNT_SID else "",
+        "twilio_whatsapp_number": settings.TWILIO_WHATSAPP_NUMBER,
+        "has_auth_token": bool(settings.TWILIO_AUTH_TOKEN and settings.TWILIO_AUTH_TOKEN != "your_twilio_auth_token"),
+        "provider": "Twilio WhatsApp API"
+    }
+
+
+@router.post("/twilio/configure", summary="Configure Twilio WhatsApp settings (updates runtime and .env)")
+async def configure_twilio(payload: TwilioConfigRequest):
+    settings.TWILIO_ACCOUNT_SID = payload.twilio_account_sid.strip()
+    settings.TWILIO_AUTH_TOKEN = payload.twilio_auth_token.strip()
+    settings.TWILIO_WHATSAPP_NUMBER = payload.twilio_whatsapp_number.strip()
+    if payload.twilio_phone_number:
+        settings.TWILIO_PHONE_NUMBER = payload.twilio_phone_number.strip()
+
+    # Update .env file
+    env_path = ".env"
+    try:
+        with open(env_path, "r", encoding="utf-8") as f:
+            lines = f.readlines()
+        
+        updated_lines = []
+        for line in lines:
+            if line.startswith("TWILIO_ACCOUNT_SID="):
+                updated_lines.append(f'TWILIO_ACCOUNT_SID="{settings.TWILIO_ACCOUNT_SID}"\n')
+            elif line.startswith("TWILIO_AUTH_TOKEN="):
+                updated_lines.append(f'TWILIO_AUTH_TOKEN="{settings.TWILIO_AUTH_TOKEN}"\n')
+            elif line.startswith("TWILIO_WHATSAPP_NUMBER="):
+                updated_lines.append(f'TWILIO_WHATSAPP_NUMBER="{settings.TWILIO_WHATSAPP_NUMBER}"\n')
+            elif line.startswith("TWILIO_PHONE_NUMBER="):
+                updated_lines.append(f'TWILIO_PHONE_NUMBER="{settings.TWILIO_PHONE_NUMBER}"\n')
+            else:
+                updated_lines.append(line)
+        
+        with open(env_path, "w", encoding="utf-8") as f:
+            f.writelines(updated_lines)
+    except Exception:
+        pass
+
+    return {
+        "success": True,
+        "message": f"Twilio WhatsApp credentials saved! From: {settings.TWILIO_WHATSAPP_NUMBER}",
+        "status": {
+            "is_configured": bool(settings.TWILIO_ACCOUNT_SID and settings.TWILIO_AUTH_TOKEN and settings.TWILIO_WHATSAPP_NUMBER),
+            "twilio_whatsapp_number": settings.TWILIO_WHATSAPP_NUMBER
+        }
+    }
+
+
+@router.post("/test-whatsapp", summary="Send an immediate test WhatsApp message to any phone number")
+async def send_test_whatsapp(payload: TestWhatsAppRequest):
+    if not payload.recipient_phone:
+        raise HTTPException(status_code=400, detail="Recipient phone number is required")
+
+    msg_body = payload.message or "🎉 *CueSpace Live Verification!* Your automated WhatsApp reminder system is working properly!"
+    success, msg = send_real_whatsapp(
+        to_phone=payload.recipient_phone,
+        message=msg_body
+    )
+
+    return {
+        "success": success,
+        "message": msg,
+        "recipient": payload.recipient_phone
     }
 
 

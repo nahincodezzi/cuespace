@@ -12,6 +12,7 @@ from app.models.event import Event
 from app.models.notification_log import NotificationLog
 from app.services.recurrence import RecurrenceEngine
 from app.services.email import send_real_email
+from app.services.whatsapp import send_real_whatsapp
 
 logger = logging.getLogger("cuespace.scheduler")
 
@@ -127,17 +128,24 @@ async def in_process_scan_and_dispatch() -> int:
             # 2. WhatsApp Dispatch
             if channels.get("whatsapp", True) or event.recipient_phone:
                 wa_text = f"🎉 *CueSpace Alert:* {event.title}!\nDate: {event.original_date} ({event.timezone})\nNote: {event.description or 'No extra notes'}\n\n_Delivered via CueSpace Timezone Engine._"
+                wa_sent, wa_dispatch_msg = send_real_whatsapp(
+                    to_phone=recip_phone,
+                    message=wa_text
+                )
+                wa_status = "DELIVERED" if wa_sent else "FAILED"
                 log_wa = NotificationLog(
                     event_id=event.id,
                     channel="WHATSAPP",
                     recipient=recip_phone,
-                    status="DELIVERED",
+                    status=wa_status,
                     scheduled_for=now_utc,
-                    sent_at=now_utc,
+                    sent_at=now_utc if wa_sent else None,
+                    error_message=None if wa_sent else wa_dispatch_msg,
                     metadata_payload={
                         "message_text": wa_text,
                         "recipient_name": greeting_name,
                         "phone": recip_phone,
+                        "dispatch_message": wa_dispatch_msg,
                         "title": event.title
                     }
                 )

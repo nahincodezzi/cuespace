@@ -276,6 +276,61 @@ export async function configureSmtpApi(data: {
   return await res.json();
 }
 
+export interface TwilioStatus {
+  is_configured: boolean;
+  twilio_account_sid: string;
+  twilio_whatsapp_number: string;
+  has_auth_token: boolean;
+  provider: string;
+}
+
+export async function fetchTwilioStatus(): Promise<TwilioStatus> {
+  try {
+    const res = await fetch(`${API_BASE}/events/twilio/status`, { cache: 'no-store' });
+    if (!res.ok) throw new Error('Failed to fetch Twilio status');
+    return await res.json();
+  } catch (err) {
+    return {
+      is_configured: false,
+      twilio_account_sid: '',
+      twilio_whatsapp_number: '',
+      has_auth_token: false,
+      provider: 'Twilio WhatsApp API'
+    };
+  }
+}
+
+export async function configureTwilioApi(data: {
+  twilio_account_sid: string;
+  twilio_auth_token: string;
+  twilio_whatsapp_number: string;
+  twilio_phone_number?: string;
+}): Promise<{ success: boolean; message: string; status: any }> {
+  const res = await fetch(`${API_BASE}/events/twilio/configure`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => ({}));
+    throw new Error(errorData.detail || 'Failed to update Twilio settings');
+  }
+  return await res.json();
+}
+
+export async function sendTestWhatsAppApi(data: { recipient_phone: string; message?: string }): Promise<any> {
+  const res = await fetch(`${API_BASE}/events/test-whatsapp`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.detail || 'Failed to send test WhatsApp message');
+  }
+  return await res.json();
+}
+
 import { SpecialDaysResponse, SubscribeSpecialDaysPayload } from '@/types/specialDays';
 
 export async function fetchSpecialDays(year: number = 2026): Promise<SpecialDaysResponse> {

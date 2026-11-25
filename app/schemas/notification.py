@@ -35,3 +35,15 @@ class SmtpConfigRequest(BaseModel):
 class TestEmailRequest(BaseModel):
     recipient_email: str
     subject: Optional[str] = None
+
+
+class TwilioConfigRequest(BaseModel):
+    twilio_account_sid: str
+    twilio_auth_token: str
+    twilio_whatsapp_number: str
+    twilio_phone_number: Optional[str] = ""
+
+
+class TestWhatsAppRequest(BaseModel):
+    recipient_phone: str
+    message: Optional[str] = None
