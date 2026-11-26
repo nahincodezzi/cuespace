@@ -38,14 +38,19 @@ app = FastAPI(
 )
 
 # CORS configuration
-if settings.BACKEND_CORS_ORIGINS:
-    app.add_middleware(
-        CORSMiddleware,
-        allow_origins=settings.BACKEND_CORS_ORIGINS,
-        allow_credentials=True,
-        allow_methods=["*"],
-        allow_headers=["*"],
-    )
+cors_origins = list(settings.BACKEND_CORS_ORIGINS or [])
+for origin in ["https://cuespace-seven.vercel.app", "http://localhost:3000", "http://127.0.0.1:3000"]:
+    if origin not in cors_origins:
+        cors_origins.append(origin)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=cors_origins,
+    allow_origin_regex=r"https://.*\.vercel\.app",
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # Include API Router
 app.include_router(api_router, prefix=settings.API_V1_STR)
