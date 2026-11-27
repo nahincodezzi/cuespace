@@ -99,6 +99,7 @@ export const BackgroundVideo: React.FC = () => {
         {!reducedMotion && isDesktop && (
           <video
             ref={darkVideoRef}
+            data-theme-video="dark"
             muted
             loop
             playsInline
@@ -146,6 +147,7 @@ export const BackgroundVideo: React.FC = () => {
         {!reducedMotion && isDesktop && (
           <video
             ref={lightVideoRef}
+            data-theme-video="light"
             muted
             loop
             playsInline

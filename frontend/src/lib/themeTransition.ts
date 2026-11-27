@@ -1,10 +1,65 @@
+import { flushSync } from 'react-dom';
+
 let themeTransitionTimer: ReturnType<typeof setTimeout> | null = null;
 let themeTransitionRaf: number | null = null;
+let vtCleanupGuardTimer: ReturnType<typeof setTimeout> | null = null;
+let isVtSwitching = false;
+
+function nextPaint(): Promise<void> {
+  return new Promise((resolve) => {
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => resolve());
+    });
+  });
+}
+
+function warmThemeVideo(nextTheme: 'light' | 'dark'): Promise<void> {
+  const video = document.querySelector<HTMLVideoElement>(
+    `video[data-theme-video="${nextTheme}"]`
+  );
+  if (!video) return Promise.resolve();
+
+  return new Promise((resolve) => {
+    let settled = false;
+    const finish = () => {
+      if (!settled) {
+        settled = true;
+        resolve();
+      }
+    };
+
+    const timeoutId = setTimeout(finish, 120);
+
+    video
+      .play()
+      .then(() => {
+        const rvfc = (
+          video as HTMLVideoElement & {
+            requestVideoFrameCallback?: (cb: () => void) => number;
+          }
+        ).requestVideoFrameCallback;
+
+        if (typeof rvfc === 'function') {
+          rvfc.call(video, () => {
+            clearTimeout(timeoutId);
+            finish();
+          });
+        } else if (video.readyState >= 2) {
+          clearTimeout(timeoutId);
+          finish();
+        }
+      })
+      .catch(() => {
+        clearTimeout(timeoutId);
+        finish();
+      });
+  });
+}
 
 /**
- * Switches theme cleanly without CSS desynchronization, flicker, or abrupt color snaps.
- * Arms `.theme-transitioning` on <html> for one animation frame before flipping the theme
- * so all surfaces, borders, text, shadows, and background layers animate in lockstep.
+ * Switches theme using Chromium's GPU View Transitions API when supported,
+ * avoiding per-frame backdrop-blur recomputation, video decoder stalls,
+ * and CSS color-scheme repaints. Falls back to synchronized CSS transitions.
  */
 export function switchThemeSmoothly(
   setTheme: (theme: string) => void,
@@ -21,6 +76,65 @@ export function switchThemeSmoothly(
     return;
   }
 
+  const doc = document as Document & {
+    startViewTransition?: (cb: () => void | Promise<void>) => {
+      ready: Promise<void>;
+      finished: Promise<void>;
+      updateCallbackDone: Promise<void>;
+    };
+  };
+
+  if (typeof doc.startViewTransition === 'function') {
+    if (isVtSwitching) return;
+    isVtSwitching = true;
+
+    const root = document.documentElement;
+    const disableStyle = document.createElement('style');
+    disableStyle.setAttribute('data-cue-vt', 'true');
+    disableStyle.textContent = `
+      *, *::before, *::after {
+        transition: none !important;
+      }
+    `;
+
+    let cleaned = false;
+    const cleanup = () => {
+      if (cleaned) return;
+      cleaned = true;
+      disableStyle.remove();
+      isVtSwitching = false;
+      if (vtCleanupGuardTimer) {
+        clearTimeout(vtCleanupGuardTimer);
+        vtCleanupGuardTimer = null;
+      }
+    };
+
+    vtCleanupGuardTimer = setTimeout(cleanup, 800);
+
+    try {
+      const transition = doc.startViewTransition(async () => {
+        document.head.appendChild(disableStyle);
+
+        root.classList.remove('light', 'dark', 'theme-transitioning');
+        root.classList.add(nextTheme);
+        root.style.colorScheme = nextTheme;
+
+        flushSync(() => {
+          setTheme(nextTheme);
+        });
+
+        await warmThemeVideo(nextTheme);
+        await nextPaint();
+      });
+
+      transition.finished.finally(cleanup);
+      return;
+    } catch {
+      cleanup();
+    }
+  }
+
+  // Fallback for browsers without View Transitions API
   const root = document.documentElement;
 
   if (themeTransitionTimer) {
