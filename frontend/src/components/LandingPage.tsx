@@ -30,7 +30,6 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       <Hero
         onOpenAddEvent={onOpenAddEvent}
         onOpenDashboard={onOpenDashboard}
-        onOpenAdmin={onOpenAdmin}
       />
 
       {/* 2. MetricsStrip: 4 cards with count up & spotlight (2x2 on mobile) */}

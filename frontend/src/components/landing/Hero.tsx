@@ -6,18 +6,16 @@ import { Reveal } from '@/components/motion/Reveal';
 import { Magnetic } from '@/components/motion/Magnetic';
 import { NotificationStack } from './NotificationStack';
 import { WallClock } from './WallClock';
-import { ArrowRight, Compass, ShieldAlert } from 'lucide-react';
+import { ArrowRight, Compass } from 'lucide-react';
 
 interface HeroProps {
   onOpenAddEvent: () => void;
   onOpenDashboard: () => void;
-  onOpenAdmin: () => void;
 }
 
 export const Hero: React.FC<HeroProps> = ({
   onOpenAddEvent,
   onOpenDashboard,
-  onOpenAdmin,
 }) => {
   const { utcTime, utcSeconds } = useNow();
 
@@ -80,22 +78,13 @@ export const Hero: React.FC<HeroProps> = ({
                 </button>
               </Magnetic>
 
-              <div className="flex items-center gap-2.5 w-full sm:w-auto">
-                <button
-                  onClick={onOpenDashboard}
-                  className="flex-1 sm:flex-none px-4 sm:px-5 py-3.5 rounded-xl text-sm font-semibold border border-[var(--border)] bg-[var(--surface)] hover:bg-[var(--surface-strong)] text-[var(--fg)] hover:text-[var(--accent-text)] shadow-xs transition-colors flex items-center justify-center gap-2 cursor-pointer"
-                >
-                  <Compass className="w-4 h-4 text-[var(--accent-text)]" />
-                  <span>Open Dashboard</span>
-                </button>
-
-                <button
-                  onClick={onOpenAdmin}
-                  className="px-3.5 sm:px-4 py-3.5 rounded-xl text-xs font-semibold text-[var(--muted)] hover:text-[var(--fg)] transition-colors cursor-pointer text-center"
-                >
-                  <span>Admin CMS</span>
-                </button>
-              </div>
+              <button
+                onClick={onOpenDashboard}
+                className="w-full sm:w-auto px-5 py-3.5 rounded-xl text-sm font-semibold border border-[var(--border)] bg-[var(--surface)] hover:bg-[var(--surface-strong)] text-[var(--fg)] hover:text-[var(--accent-text)] shadow-xs transition-colors flex items-center justify-center gap-2 cursor-pointer"
+              >
+                <Compass className="w-4 h-4 text-[var(--accent-text)]" />
+                <span>Open Dashboard</span>
+              </button>
             </div>
           </Reveal>
 
