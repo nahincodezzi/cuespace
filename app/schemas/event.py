@@ -23,7 +23,7 @@ class EventBase(BaseModel):
 
     # Multi-channel & alert leads
     channels: NotificationChannels = Field(default_factory=NotificationChannels)
-    alert_lead_days: List[int] = Field(default=[0, 3], example=[0, 1, 3])
+    alert_lead_days: List[int] = Field(default=[0, 1, 2, 3], example=[0, 1, 2, 3])
 
     # Recipient details
     recipient_name: Optional[str] = Field(default=None, example="Sarah Jenkins")

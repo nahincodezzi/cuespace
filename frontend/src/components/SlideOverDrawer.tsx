@@ -37,7 +37,7 @@ export const SlideOverDrawer: React.FC<SlideOverDrawerProps> = ({
     recurrence_type: 'YEARLY',
     recurrence_interval: 1,
     channels: { email: true, sms: false, whatsapp: true },
-    alert_lead_days: [0, 3],
+    alert_lead_days: [0, 1, 2, 3],
     recipient_name: '',
     recipient_phone: '',
     recipient_email: ''

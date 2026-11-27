@@ -54,8 +54,8 @@ class Event(TimeStampedUUIDModel):
     # Example: {"email": true, "sms": false, "whatsapp": true}
     channels: Mapped[dict] = mapped_column(JSONB, default=lambda: {"email": True, "sms": False, "whatsapp": False}, nullable=False)
 
-    # Lead offsets in minutes or days: [0, 1440, 4320] (on day, 1 day prior, 3 days prior)
-    alert_lead_days: Mapped[list] = mapped_column(JSONB, default=lambda: [0, 3], nullable=False)
+    # Lead offsets in minutes or days: [0, 1, 2, 3] (on day, 1 day prior, 2 days prior, 3 days prior)
+    alert_lead_days: Mapped[list] = mapped_column(JSONB, default=lambda: [0, 1, 2, 3], nullable=False)
 
     # Recipient overrides (e.g. spouse, client phone)
     recipient_name: Mapped[Optional[str]] = mapped_column(String(100), nullable=True)

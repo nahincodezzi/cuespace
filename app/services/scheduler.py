@@ -1,5 +1,6 @@
 import asyncio
 import logging
+import pytz
 from datetime import datetime, timezone
 from typing import List, Dict, Any
 from sqlalchemy import select
@@ -64,12 +65,52 @@ async def in_process_scan_and_dispatch() -> int:
             recip_phone = event.recipient_phone or user_phone or "+8801700000000"
             greeting_name = event.recipient_name or "Valued Guest"
             
+            # Calculate advance lead timing relative to the target event occurrence in event timezone
+            try:
+                user_tz = pytz.timezone(event.timezone)
+            except Exception:
+                user_tz = pytz.UTC
+            now_in_user_tz = now_utc.astimezone(user_tz)
+            today_user_date = now_in_user_tz.date()
+
+            next_occ_date = RecurrenceEngine.compute_next_event_date(
+                original_date=event.original_date,
+                reference_date=today_user_date,
+                recurrence_type=event.recurrence_type or "YEARLY",
+                recurrence_interval=event.recurrence_interval or 1,
+                calendar_type=event.calendar_type or "GREGORIAN",
+                leap_handling=event.leap_year_handling or "FEB_28"
+            ) or event.original_date
+
+            days_diff = (next_occ_date - today_user_date).days if next_occ_date >= today_user_date else 0
+
+            if days_diff == 0:
+                timing_badge = "🎉 Happening Today!"
+                timing_subject_prefix = "🔔 Today:"
+                wa_timing = "is today!"
+            elif days_diff == 1:
+                timing_badge = "⏰ Tomorrow (1 Day Before)"
+                timing_subject_prefix = "⏰ 1 Day Before:"
+                wa_timing = "is tomorrow (1 day before)!"
+            elif days_diff == 2:
+                timing_badge = "⏰ In 2 Days (Advance Reminder)"
+                timing_subject_prefix = "⏰ 2 Days Ahead:"
+                wa_timing = "is coming up in 2 days!"
+            elif days_diff == 3:
+                timing_badge = "⏰ In 3 Days (Advance Reminder)"
+                timing_subject_prefix = "⏰ 3 Days Ahead:"
+                wa_timing = "is coming up in 3 days!"
+            else:
+                timing_badge = f"⏰ In {days_diff} Days (Advance Reminder)"
+                timing_subject_prefix = f"⏰ {days_diff} Days Ahead:"
+                wa_timing = f"is coming up in {days_diff} days!"
+
             token_3h = generate_signed_action_token({"event_id": str(event.id), "snooze_hours": 3})
             token_24h = generate_signed_action_token({"event_id": str(event.id), "snooze_hours": 24})
             snooze_url_3h = f"{settings.BACKEND_URL}/api/v1/events/snooze?token={token_3h}"
             snooze_url_24h = f"{settings.BACKEND_URL}/api/v1/events/snooze?token={token_24h}"
             
-            email_subject = f"🔔 CueSpace Reminder: {event.title}"
+            email_subject = f"{timing_subject_prefix} {event.title} - CueSpace Reminder"
             reminder_time_str = event.reminder_time.strftime('%H:%M') if hasattr(event.reminder_time, 'strftime') else str(event.reminder_time)[:5]
             
             email_html = f"""<div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 580px; margin: 0 auto; background: #0c0d14; border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; padding: 28px; color: #ededed;">
@@ -77,12 +118,15 @@ async def in_process_scan_and_dispatch() -> int:
     <span style="font-size: 13px; font-weight: 700; color: #818cf8; letter-spacing: 0.05em; text-transform: uppercase;">✨ CueSpace Autonomous Alert</span>
     <span style="font-size: 11px; color: #71717a;">{now_utc.strftime('%b %d, %Y - %I:%M %p')} UTC</span>
   </div>
+  <div style="margin-bottom: 14px;">
+    <span style="display: inline-block; background: rgba(99,102,241,0.18); border: 1px solid rgba(99,102,241,0.35); color: #c7d2fe; font-size: 11px; font-weight: 700; padding: 4px 12px; border-radius: 9999px; text-transform: uppercase; letter-spacing: 0.04em;">{timing_badge}</span>
+  </div>
   <p style="font-size: 14px; color: #a1a1aa; margin: 0 0 8px 0;">Dear {greeting_name},</p>
   <h2 style="font-size: 20px; font-weight: 700; color: #ffffff; margin: 0 0 12px 0;">{event.title}</h2>
   <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; padding: 14px; margin-bottom: 20px;">
     <p style="font-size: 13px; line-height: 1.6; color: #d4d4d8; margin: 0;">{event.description or 'Special milestone celebration scheduled in CueSpace.'}</p>
     <div style="margin-top: 10px; font-size: 11px; color: #a1a1aa;">
-      <span>📅 Date: <strong>{event.original_date}</strong></span> &bull; 
+      <span>📅 Event Date: <strong>{next_occ_date}</strong></span> &bull; 
       <span>⏰ Reminder Time: <strong>{reminder_time_str}</strong></span> &bull; 
       <span>🌍 Timezone: <strong>{event.timezone}</strong></span>
     </div>
@@ -119,6 +163,8 @@ async def in_process_scan_and_dispatch() -> int:
                         "subject": email_subject,
                         "html_body": email_html,
                         "recipient_name": greeting_name,
+                        "timing_badge": timing_badge,
+                        "days_diff": days_diff,
                         "dispatch_message": dispatch_msg,
                         "title": event.title
                     }
@@ -127,7 +173,7 @@ async def in_process_scan_and_dispatch() -> int:
 
             # 2. WhatsApp Dispatch
             if channels.get("whatsapp", True) or event.recipient_phone:
-                wa_text = f"🎉 *CueSpace Alert:* {event.title}!\nDate: {event.original_date} ({event.timezone})\nNote: {event.description or 'No extra notes'}\n\n_Delivered via CueSpace Timezone Engine._"
+                wa_text = f"🎉 *CueSpace Alert ({timing_badge}):*\n\n*{event.title}* {wa_timing}\n📅 Event Date: {next_occ_date} ({event.timezone})\n⏰ Reminder Time: {reminder_time_str}\n📝 Note: {event.description or 'Special reminder scheduled in CueSpace.'}\n\n_Delivered automatically via CueSpace Timezone Engine._"
                 wa_sent, wa_dispatch_msg = send_real_whatsapp(
                     to_phone=recip_phone,
                     message=wa_text
@@ -164,6 +210,8 @@ async def in_process_scan_and_dispatch() -> int:
                 "recipient_email": recip_email,
                 "recipient_phone": recip_phone,
                 "triggered_at": now_utc.isoformat(),
+                "timing_badge": timing_badge,
+                "days_diff": days_diff,
                 "channels": channels
             }
             LIVE_ALERTS.insert(0, alert_item)

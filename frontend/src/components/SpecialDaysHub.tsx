@@ -48,7 +48,7 @@ export const SpecialDaysHub: React.FC<SpecialDaysHubProps> = ({
   const [subEmail, setSubEmail] = useState<string>('');
   const [subPhone, setSubPhone] = useState<string>('+8801');
   const [subName, setSubName] = useState<string>('');
-  const [leadDays, setLeadDays] = useState<number[]>([1, 2]);
+  const [leadDays, setLeadDays] = useState<number[]>([3, 2, 1, 0]);
   const [channelEmail, setChannelEmail] = useState<boolean>(true);
   const [channelWhatsapp, setChannelWhatsapp] = useState<boolean>(true);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
@@ -593,10 +593,11 @@ export const SpecialDaysHub: React.FC<SpecialDaysHubProps> = ({
               {/* Advance Lead Time Selection */}
               <div>
                 <label className={`block text-xs font-semibold mb-1.5 ${textPrimary}`}>
-                  When do you want to receive the alerts?
+                  When do you want to receive the alerts? (কখন মেসেজ পেতে চান)
                 </label>
-                <div className="grid grid-cols-3 gap-2">
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                   {[
+                    { days: 3, label: '3 Days Before' },
                     { days: 2, label: '2 Days Before' },
                     { days: 1, label: '1 Day Before' },
                     { days: 0, label: 'On the Day' },

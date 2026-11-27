@@ -113,7 +113,7 @@ async def subscribe_special_days(
             except Exception:
                 pass
 
-    lead_days = payload.alert_lead_days or [1, 2]
+    lead_days = payload.alert_lead_days or [0, 1, 2, 3]
     reminder_clock = time(9, 0, 0)  # 9:00 AM local time
 
     for day_id in payload.day_ids:

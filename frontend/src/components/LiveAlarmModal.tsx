@@ -15,6 +15,8 @@ export interface LiveAlertItem {
   recipient_email?: string;
   recipient_phone?: string;
   triggered_at: string;
+  timing_badge?: string;
+  days_diff?: number;
   channels: {
     email?: boolean;
     whatsapp?: boolean;
@@ -104,7 +106,7 @@ export const LiveAlarmModal: React.FC<LiveAlarmModalProps> = ({
             </div>
 
             <div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 flex-wrap">
                 <span className="text-[11px] font-mono uppercase tracking-wider font-bold text-indigo-400">
                   Real-Time Alarm Active
                 </span>
@@ -112,6 +114,11 @@ export const LiveAlarmModal: React.FC<LiveAlarmModalProps> = ({
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
                   LIVE
                 </span>
+                {alert.timing_badge && (
+                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 font-bold">
+                    {alert.timing_badge}
+                  </span>
+                )}
               </div>
               <h2 className="text-lg font-extrabold tracking-tight mt-0.5 truncate max-w-xs sm:max-w-sm">
                 {alert.title}
