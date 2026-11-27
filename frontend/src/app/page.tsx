@@ -21,6 +21,7 @@ import { fetchEvents, createEventApi, fetchLiveAlerts, clearLiveAlertsApi } from
 import { LiveAlarmModal, LiveAlertItem } from '@/components/LiveAlarmModal';
 import { LayoutGrid, ListFilter, Sparkles, Compass, ShieldAlert, Calendar } from 'lucide-react';
 import { useTheme } from 'next-themes';
+import { switchThemeSmoothly } from '@/lib/themeTransition';
 
 export default function DashboardPage() {
   const [events, setEvents] = useState<SmartEvent[]>([]);
@@ -34,7 +35,7 @@ export default function DashboardPage() {
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
   const isDarkMode = !mounted || resolvedTheme === 'dark';
-  const toggleTheme = () => setTheme(isDarkMode ? 'light' : 'dark');
+  const toggleTheme = () => switchThemeSmoothly(setTheme, isDarkMode ? 'light' : 'dark');
   
   // Landing Page CMS Content State
   const [landingContent, setLandingContent] = useState<LandingContent>(DEFAULT_LANDING_CONTENT);
@@ -161,7 +162,7 @@ export default function DashboardPage() {
   }, [events, searchQuery, selectedCategory]);
 
   return (
-    <div className="min-h-screen bg-transparent text-[var(--fg)] antialiased transition-colors duration-500">
+    <div className="min-h-screen bg-transparent text-[var(--fg)] antialiased">
       
       {/* Toast Notification */}
       {toastMessage && (

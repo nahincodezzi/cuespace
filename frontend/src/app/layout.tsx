@@ -57,7 +57,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       suppressHydrationWarning
       className={`${geistSans.variable} ${geistMono.variable} ${instrumentSerif.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col bg-[var(--bg)] text-[var(--fg)] transition-colors duration-500">
+      <body className="min-h-full flex flex-col bg-[var(--bg)] text-[var(--fg)]">
         <Providers>
           {children}
         </Providers>

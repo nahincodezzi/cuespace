@@ -1,6 +1,24 @@
 @import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));
+
+@property --shimmer-a {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: #6D28D9;
+}
+@property --shimmer-b {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: #C2410C;
+}
+@property --shimmer-c {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: #4F46E5;
+}
 
 :root {                       /* LIGHT */
+  color-scheme: light;
   --bg: #F8F6FF;
   --bg-glow: rgb(124 58 237 / .14);
   --surface: rgb(255 255 255 / .78);
@@ -24,11 +42,15 @@
   --node-active: #EDE9FE;
   --node-active-border: #7C3AED;
   --clock-hand: #B45309;
-  --shimmer: #6D28D9, #C2410C, #4F46E5, #6D28D9;
+  --shimmer-a: #6D28D9;
+  --shimmer-b: #C2410C;
+  --shimmer-c: #4F46E5;
+  --shimmer: var(--shimmer-a), var(--shimmer-b), var(--shimmer-c), var(--shimmer-a);
   --font-serif: 'Instrument Serif', Georgia, serif;
 }
 
 .dark {                       /* DARK */
+  color-scheme: dark;
   --bg: #07060B;
   --bg-glow: rgb(124 58 237 / .22);
   --surface: rgb(255 255 255 / .035);
@@ -52,15 +74,40 @@
   --node-active: rgb(99 102 241 / .35);
   --node-active-border: rgb(167 139 250 / .8);
   --clock-hand: #F5B544;
-  --shimmer: #C4B5FD, #F5B544, #A78BFA, #C4B5FD;
+  --shimmer-a: #C4B5FD;
+  --shimmer-b: #F5B544;
+  --shimmer-c: #A78BFA;
+  --shimmer: var(--shimmer-a), var(--shimmer-b), var(--shimmer-c), var(--shimmer-a);
 }
 
 html {
-  transition: background-color .6s, color .6s;
   scroll-behavior: smooth;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+/* Synchronized 480ms theme transition across all surfaces, text, borders, and backdrop */
+html.theme-transitioning,
+html.theme-transitioning *:not(.theme-fade):not(.theme-icon):not(video),
+html.theme-transitioning *:not(.theme-fade):not(.theme-icon):not(video)::before,
+html.theme-transitioning *:not(.theme-fade):not(.theme-icon):not(video)::after {
+  transition-property: background-color, border-color, color, fill, stroke, box-shadow, --shimmer-a, --shimmer-b, --shimmer-c !important;
+  transition-duration: 480ms !important;
+  transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1) !important;
+}
+
+html .light-theme-layer {
+  opacity: 1;
+}
+html.dark .light-theme-layer {
+  opacity: 0;
+}
+
+html.theme-transitioning .theme-fade {
+  transition-property: opacity !important;
+  transition-duration: 480ms !important;
+  transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1) !important;
 }
 
 body {

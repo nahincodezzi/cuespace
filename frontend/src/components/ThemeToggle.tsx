@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { useTheme } from 'next-themes';
 import { Sun, Moon } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { switchThemeSmoothly } from '@/lib/themeTransition';
 
 export const ThemeToggle: React.FC<{ className?: string }> = ({ className }) => {
   const { resolvedTheme, setTheme } = useTheme();
@@ -22,29 +22,27 @@ export const ThemeToggle: React.FC<{ className?: string }> = ({ className }) => 
   const isDark = resolvedTheme === 'dark';
 
   const toggleTheme = () => {
-    setTheme(isDark ? 'light' : 'dark');
+    switchThemeSmoothly(setTheme, isDark ? 'light' : 'dark');
   };
 
   return (
     <button
       onClick={toggleTheme}
-      aria-label="Switch to light/dark mode"
-      className={`relative w-11 h-11 rounded-xl flex items-center justify-center transition-colors border border-[var(--border)] bg-[var(--surface)] hover:bg-[var(--surface-strong)] text-[var(--fg)] hover:text-[var(--accent-text)] ${className || ''}`}
+      aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
+      className={`relative w-11 h-11 rounded-xl flex items-center justify-center border border-[var(--border)] bg-[var(--surface)] hover:bg-[var(--surface-strong)] text-[var(--fg)] hover:text-[var(--accent-text)] transition-colors duration-200 cursor-pointer select-none ${className || ''}`}
     >
-      <motion.div
-        key={isDark ? 'dark' : 'light'}
-        initial={{ rotate: -90, opacity: 0, scale: 0.8 }}
-        animate={{ rotate: 0, opacity: 1, scale: 1 }}
-        exit={{ rotate: 90, opacity: 0, scale: 0.8 }}
-        transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
-        className="flex items-center justify-center"
-      >
-        {isDark ? (
-          <Sun className="w-4 h-4 text-[var(--amber)]" />
-        ) : (
-          <Moon className="w-4 h-4 text-[var(--accent-2)]" />
-        )}
-      </motion.div>
+      <span className="relative w-4 h-4 flex items-center justify-center">
+        <Sun
+          className={`theme-icon w-4 h-4 text-[var(--amber)] absolute transition-all duration-[420ms] ease-[cubic-bezier(0.22,1,0.36,1)] ${
+            isDark ? 'opacity-100 rotate-0 scale-100' : 'opacity-0 rotate-90 scale-50'
+          }`}
+        />
+        <Moon
+          className={`theme-icon w-4 h-4 text-[var(--accent-2)] absolute transition-all duration-[420ms] ease-[cubic-bezier(0.22,1,0.36,1)] ${
+            isDark ? 'opacity-0 -rotate-90 scale-50' : 'opacity-100 rotate-0 scale-100'
+          }`}
+        />
+      </span>
     </button>
   );
 };
