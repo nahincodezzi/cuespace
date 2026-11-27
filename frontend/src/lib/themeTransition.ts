@@ -3,63 +3,13 @@ import { flushSync } from 'react-dom';
 let themeTransitionTimer: ReturnType<typeof setTimeout> | null = null;
 let themeTransitionRaf: number | null = null;
 let vtCleanupGuardTimer: ReturnType<typeof setTimeout> | null = null;
-let isVtSwitching = false;
-
-function nextPaint(): Promise<void> {
-  return new Promise((resolve) => {
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => resolve());
-    });
-  });
-}
-
-function warmThemeVideo(nextTheme: 'light' | 'dark'): Promise<void> {
-  const video = document.querySelector<HTMLVideoElement>(
-    `video[data-theme-video="${nextTheme}"]`
-  );
-  if (!video) return Promise.resolve();
-
-  return new Promise((resolve) => {
-    let settled = false;
-    const finish = () => {
-      if (!settled) {
-        settled = true;
-        resolve();
-      }
-    };
-
-    const timeoutId = setTimeout(finish, 120);
-
-    video
-      .play()
-      .then(() => {
-        const rvfc = (
-          video as HTMLVideoElement & {
-            requestVideoFrameCallback?: (cb: () => void) => number;
-          }
-        ).requestVideoFrameCallback;
-
-        if (typeof rvfc === 'function') {
-          rvfc.call(video, () => {
-            clearTimeout(timeoutId);
-            finish();
-          });
-        } else if (video.readyState >= 2) {
-          clearTimeout(timeoutId);
-          finish();
-        }
-      })
-      .catch(() => {
-        clearTimeout(timeoutId);
-        finish();
-      });
-  });
-}
+let activeCleanup: (() => void) | null = null;
 
 /**
  * Switches theme using Chromium's GPU View Transitions API when supported,
- * avoiding per-frame backdrop-blur recomputation, video decoder stalls,
- * and CSS color-scheme repaints. Falls back to synchronized CSS transitions.
+ * executing DOM and React updates strictly synchronously inside the callback
+ * so Chromium never hits a DOM update timeout.
+ * Falls back to synchronized CSS transitions on browsers without View Transitions.
  */
 export function switchThemeSmoothly(
   setTheme: (theme: string) => void,
@@ -77,16 +27,19 @@ export function switchThemeSmoothly(
   }
 
   const doc = document as Document & {
-    startViewTransition?: (cb: () => void | Promise<void>) => {
+    startViewTransition?: (cb: () => void) => {
       ready: Promise<void>;
       finished: Promise<void>;
       updateCallbackDone: Promise<void>;
+      skipTransition: () => void;
     };
   };
 
   if (typeof doc.startViewTransition === 'function') {
-    if (isVtSwitching) return;
-    isVtSwitching = true;
+    // Clean up any leftover previous transition styles before starting a new one
+    if (activeCleanup) {
+      activeCleanup();
+    }
 
     const root = document.documentElement;
     const disableStyle = document.createElement('style');
@@ -97,22 +50,33 @@ export function switchThemeSmoothly(
       }
     `;
 
+    // Kick off incoming background video playback immediately without blocking callback
+    const incomingVideo = document.querySelector<HTMLVideoElement>(
+      `video[data-theme-video="${nextTheme}"]`
+    );
+    if (incomingVideo && incomingVideo.paused) {
+      incomingVideo.play().catch(() => {});
+    }
+
     let cleaned = false;
     const cleanup = () => {
       if (cleaned) return;
       cleaned = true;
       disableStyle.remove();
-      isVtSwitching = false;
       if (vtCleanupGuardTimer) {
         clearTimeout(vtCleanupGuardTimer);
         vtCleanupGuardTimer = null;
       }
+      if (activeCleanup === cleanup) {
+        activeCleanup = null;
+      }
     };
 
-    vtCleanupGuardTimer = setTimeout(cleanup, 800);
+    activeCleanup = cleanup;
+    vtCleanupGuardTimer = setTimeout(cleanup, 750);
 
     try {
-      const transition = doc.startViewTransition(async () => {
+      const transition = doc.startViewTransition(() => {
         document.head.appendChild(disableStyle);
 
         root.classList.remove('light', 'dark', 'theme-transitioning');
@@ -122,12 +86,12 @@ export function switchThemeSmoothly(
         flushSync(() => {
           setTheme(nextTheme);
         });
-
-        await warmThemeVideo(nextTheme);
-        await nextPaint();
       });
 
-      transition.finished.finally(cleanup);
+      // Prevent unhandled promise rejections on aborted/skipped transitions
+      transition.updateCallbackDone.catch(() => {});
+      transition.ready.catch(() => {});
+      transition.finished.catch(() => {}).finally(cleanup);
       return;
     } catch {
       cleanup();
